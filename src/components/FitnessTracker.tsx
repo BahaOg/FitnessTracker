@@ -5,6 +5,9 @@ interface User {
   id: string;
   name: string;
   email: string;
+  birthDate: string;
+  height : string;
+  weight : string;
 }
 
 interface Workout {
