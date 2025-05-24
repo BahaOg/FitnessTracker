@@ -1,0 +1,71 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.jumbotron {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.list-group-item {
+  border-left: none;
+  border-right: none;
+}
+
+.workout-item {
+  border-left: 4px solid #0d6efd;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.workout-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.workout-item.cardio {
+  border-left-color: #dc3545;
+}
+
+.workout-item.strength {
+  border-left-color: #198754;
+}
+
+.workout-item.flexibility {
+  border-left-color: #0dcaf0;
+}
+
+.workout-item.sports {
+  border-left-color: #fd7e14;
+}
+
+.workout-item.other {
+  border-left-color: #6c757d;
+}
+
+.btn-floating {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+} 
