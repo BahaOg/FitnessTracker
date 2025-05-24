@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/workouts', workoutRoutes);
 
-// Connect to MongoDB
+//   Connect to MongoDB
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/fitness-tracker');
@@ -38,8 +38,6 @@ const connectDB = async () => {
 };
 
 // Start server
-connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
-}); 
