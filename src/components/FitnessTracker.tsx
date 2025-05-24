@@ -17,12 +17,16 @@ interface Workout {
   notes?: string;
 }
 
+interface FitnessTrackerProps {
+  onNavigateToLanding?: () => void;
+}
+
 type Page = 'home' | 'register' | 'login' | 'dashboard';
 
 // Use relative API URL since frontend and backend are on the same server
 const API_URL = '/api';
 
-const FitnessTracker: React.FC = () => {
+const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [user, setUser] = useState<User | null>(null);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -134,6 +138,9 @@ const FitnessTracker: React.FC = () => {
     setIsAuthenticated(false);
     setWorkouts([]);
     setCurrentPage('home');
+    if (onNavigateToLanding) {
+      onNavigateToLanding();
+    }
   };
 
   const loadWorkouts = async () => {

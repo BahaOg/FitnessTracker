@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import FitnessTracker from '../components/FitnessTracker';
+import App from '../components/App';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -10,6 +10,6 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <FitnessTracker />
+    <App />
   </React.StrictMode>
 ); 
