@@ -38,11 +38,9 @@ interface CalorieEntry {
 interface ProgressDashboardProps {
   user: User;
   workouts: Workout[];
-  onNavigate: (page: string) => void;
-  onLogout: () => void;
 }
 
-const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts, onNavigate, onLogout }) => {
+const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts }) => {
   const [dateRange, setDateRange] = useState({
     start: new Date(Date.now() - 23 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 23 days ago
     end: new Date().toISOString().split('T')[0] // today
@@ -233,47 +231,6 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts, o
 
   return (
     <div className="progress-dashboard">
-      {/* Navigation Bar */}
-      <nav className="dashboard-navbar">
-        <div className="navbar-content">
-          <div className="navbar-brand">
-            <h2>Fitness Tracker</h2>
-          </div>
-          <div className="navbar-menu">
-            <button 
-              className="nav-button active"
-              onClick={() => onNavigate('dashboard')}
-            >
-              Dashboard
-            </button>
-            <button 
-              className="nav-button"
-              onClick={() => onNavigate('workouts')}
-            >
-              Workouts
-            </button>
-            <button 
-              className="nav-button"
-              onClick={() => onNavigate('calculator')}
-            >
-              Calorie Calculator
-            </button>
-            <button 
-              className="nav-button"
-              onClick={() => onNavigate('profile')}
-            >
-              Profile
-            </button>
-            <button 
-              className="nav-button logout"
-              onClick={onLogout}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
-
       <div className="dashboard-header">
         <h1>Progress Dashboard</h1>
         <div className="date-range-selector">

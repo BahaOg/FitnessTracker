@@ -5,6 +5,7 @@ import CalorieCalculator from './CalorieCalculator';
 import ProgressDashboard from './ProgressDashboard';
 import MyWorkouts from './MyWorkouts';
 import './FitnessTracker.css';
+import './LoginPage.css';
 
 interface User {
   id: string;
@@ -397,37 +398,73 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
   );
 
   const renderRegisterPage = () => (
-    <RegisterPage onRegisterSuccess={handleRegister} />
+    <RegisterPage 
+      onRegisterSuccess={handleRegister}
+      onBack={() => setCurrentPage('home')}
+    />
   );
 
   const renderLoginPage = () => (
-    <div>
-      <h2 className="mb-4">Login</h2>
-      <form onSubmit={handleLogin}>
-        <div className="mb-3">
-          <label htmlFor="login-email" className="form-label">Email</label>
-          <input 
-            type="email" 
-            className="form-control" 
-            id="login-email" 
-            value={loginForm.email}
-            onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
-            required 
-          />
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <button 
+            className="back-button"
+            onClick={() => setCurrentPage('home')}
+            type="button"
+          >
+            ← Go Back
+          </button>
         </div>
-        <div className="mb-3">
-          <label htmlFor="login-password" className="form-label">Password</label>
-          <input 
-            type="password" 
-            className="form-control" 
-            id="login-password" 
-            value={loginForm.password}
-            onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
-            required 
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">Login</button>
-      </form>
+        <h1 className="login-title">Welcome Back</h1>
+        <p className="login-subtitle">Sign in to continue your fitness journey</p>
+        
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-section">
+            <div className="form-group">
+              <label htmlFor="login-email">Email Address</label>
+              <input 
+                type="email" 
+                id="login-email" 
+                name="email"
+                value={loginForm.email}
+                onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+                placeholder="Enter your email address"
+                required 
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="login-password">Password</label>
+              <input 
+                type="password" 
+                id="login-password" 
+                name="password"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                placeholder="Enter your password"
+                required 
+              />
+            </div>
+          </div>
+          
+          <button type="submit" className="login-button">
+            Sign In
+          </button>
+          
+          <div className="login-footer">
+            <p>Don't have an account? 
+              <button 
+                type="button"
+                className="link-button"
+                onClick={() => setCurrentPage('register')}
+              >
+                Create Account
+              </button>
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
   );
 
@@ -441,13 +478,6 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
       <ProgressDashboard 
         user={user} 
         workouts={workouts}
-        onNavigate={(page: string) => {
-          setCurrentPage(page as Page);
-          if (page === 'workouts') {
-            loadWorkouts();
-          }
-        }}
-        onLogout={handleLogout}
       />
     );
   };
@@ -467,14 +497,6 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     return (
       <CalorieCalculator 
         user={user} 
-        onBack={() => setCurrentPage('dashboard')}
-        onNavigate={(page: string) => {
-          setCurrentPage(page as Page);
-          if (page === 'workouts') {
-            loadWorkouts();
-          }
-        }}
-        onLogout={handleLogout}
       />
     );
   };
@@ -502,8 +524,8 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
 
   return (
     <>
-      {currentPage !== 'register' && renderNavbar()}
-      {currentPage === 'register' ? (
+      {currentPage !== 'register' && currentPage !== 'login' && renderNavbar()}
+      {currentPage === 'register' || currentPage === 'login' ? (
         renderCurrentPage()
       ) : (
         <div className="container my-5">

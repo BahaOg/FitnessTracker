@@ -15,12 +15,10 @@ interface User {
 
 interface CalorieCalculatorProps {
   user: User;
-  onBack: () => void;
-  onNavigate?: (page: string) => void;
-  onLogout?: () => void;
+  // onBack, onNavigate, and onLogout props are no longer needed since navigation is handled by main navbar
 }
 
-const CalorieCalculator: React.FC<CalorieCalculatorProps> = ({ user, onBack, onNavigate, onLogout }) => {
+const CalorieCalculator: React.FC<CalorieCalculatorProps> = ({ user }) => {
   const [dailyCalorieIntake, setDailyCalorieIntake] = useState<string>('2000');
   const [exercise, setExercise] = useState<string>('walking');
   const [duration, setDuration] = useState<string>('60');
@@ -155,55 +153,9 @@ const CalorieCalculator: React.FC<CalorieCalculatorProps> = ({ user, onBack, onN
 
   return (
     <div className="calorie-calculator-container">
-      {/* Navigation Bar */}
-      {onNavigate && onLogout && (
-        <nav className="calculator-navbar">
-          <div className="navbar-content">
-            <div className="navbar-brand">
-              <h2>Fitness Tracker</h2>
-            </div>
-            <div className="navbar-menu">
-              <button 
-                className="nav-button"
-                onClick={() => onNavigate('dashboard')}
-              >
-                Dashboard
-              </button>
-              <button 
-                className="nav-button"
-                onClick={() => onNavigate('workouts')}
-              >
-                Workouts
-              </button>
-              <button 
-                className="nav-button active"
-                onClick={() => onNavigate('calculator')}
-              >
-                Calorie Calculator
-              </button>
-              <button 
-                className="nav-button"
-                onClick={() => onNavigate('profile')}
-              >
-                Profile
-              </button>
-              <button 
-                className="nav-button logout"
-                onClick={onLogout}
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </nav>
-      )}
-      
       <div className="calculator-content-wrapper">
         <div className="calorie-calculator-card">
           <div className="calculator-header">
-            <button className="back-button" onClick={onBack}>
-              ← Back
-            </button>
             <h1 className="calculator-title">Calorie Calculator</h1>
           </div>
           

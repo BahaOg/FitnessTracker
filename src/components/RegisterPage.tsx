@@ -15,9 +15,10 @@ interface UserData {
 
 interface RegisterPageProps {
   onRegisterSuccess?: (userData: UserData) => Promise<boolean>;
+  onBack?: () => void;
 }
 
-const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess }) => {
+const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess, onBack }) => {
   const [formData, setFormData] = useState<UserData>({
     name: '',
     surname: '',
@@ -144,6 +145,17 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess }) => {
   return (
     <div className="register-container">
       <div className="register-card">
+        {onBack && (
+          <div className="register-header">
+            <button 
+              className="back-button"
+              onClick={onBack}
+              type="button"
+            >
+              ← Go Back
+            </button>
+          </div>
+        )}
         <h1 className="register-title">Create Your Account</h1>
         <p className="register-subtitle">Join our fitness community and start your journey</p>
         
