@@ -13,7 +13,11 @@ interface UserData {
   GOAL: string;
 }
 
-const RegisterPage: React.FC = () => {
+interface RegisterPageProps {
+  onRegisterSuccess?: (userData: UserData) => Promise<boolean>;
+}
+
+const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess }) => {
   const [formData, setFormData] = useState<UserData>({
     name: '',
     surname: '',
@@ -95,23 +99,40 @@ const RegisterPage: React.FC = () => {
 
       console.log('User object created:', userObject);
       
-      // Here you would typically send the data to your backend
-      // For now, we'll just log it and show a success message
-      alert('Registration successful! User object created.');
-      
-      // Reset form
-      setFormData({
-        name: '',
-        surname: '',
-        email: '',
-        password: '',
-        gender: '',
-        height: '',
-        weight: '',
-        birthDate: '',
-        GOAL: ''
-      });
-      
+      if (onRegisterSuccess) {
+        // Use the callback provided by parent component
+        const success = await onRegisterSuccess(userObject);
+        if (success) {
+          alert('Registration successful! Welcome to Fitness Tracker.');
+          // Reset form
+          setFormData({
+            name: '',
+            surname: '',
+            email: '',
+            password: '',
+            gender: '',
+            height: '',
+            weight: '',
+            birthDate: '',
+            GOAL: ''
+          });
+        }
+      } else {
+        // Fallback behavior when no callback is provided
+        alert('Registration successful! User object created.');
+        // Reset form
+        setFormData({
+          name: '',
+          surname: '',
+          email: '',
+          password: '',
+          gender: '',
+          height: '',
+          weight: '',
+          birthDate: '',
+          GOAL: ''
+        });
+      }
     } catch (error) {
       console.error('Registration error:', error);
       alert('Registration failed. Please try again.');
@@ -219,7 +240,6 @@ const RegisterPage: React.FC = () => {
                 <option value="">Select your gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
-                <option value="other">Other</option>
               </select>
               {errors.gender && <span className="error-message">{errors.gender}</span>}
             </div>

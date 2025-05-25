@@ -4,11 +4,36 @@ A web application for tracking fitness activities built with TypeScript, Node.js
 
 ## Features
 
-- User registration and authentication
-- Create, read, and delete workout entries
-- Track different types of workouts (cardio, strength, flexibility, sports)
-- Record workout details including duration, date, calories burned, and notes
-- Responsive UI built with Bootstrap 5
+- **User Authentication**: Secure registration and login system
+- **Comprehensive User Profiles**: Complete user registration with personal information, body metrics, and fitness goals
+- **Workout Tracking**: Log different types of workouts with duration and calories burned
+- **Dashboard**: View and manage your workout history
+- **Responsive Design**: Works on desktop and mobile devices
+- **Modern UI**: Beautiful, intuitive user interface with smooth animations
+
+### Registration System
+
+The application features a comprehensive registration system that collects:
+
+**Personal Information:**
+- First Name and Last Name
+- Email Address
+- Password (minimum 6 characters)
+- Birth Date
+
+**Body Information:**
+- Gender (Male, Female, Other)
+- Height (flexible format: cm, feet/inches)
+- Weight (flexible format: kg, lbs)
+
+**Fitness Goals:**
+- Weight Loss
+- Muscle Gain
+- Maintenance
+- Endurance
+- Strength
+
+The registration form includes real-time validation, error handling, and a modern, responsive design that works across all devices.
 
 ## Technologies Used
 

@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import RegisterPage from './RegisterPage';
 import './FitnessTracker.css';
 
 interface User {
   id: string;
   name: string;
+  surname: string;
   email: string;
+  password: string;
+  gender: string;
+  height: string;
+  weight: string;
   birthDate: string;
-  height : string;
-  weight : string;
+  GOAL: string;
 }
 
 interface Workout {
@@ -22,6 +27,7 @@ interface Workout {
 
 interface FitnessTrackerProps {
   onNavigateToLanding?: () => void;
+  initialPage?: 'home' | 'register' | 'login';
 }
 
 type Page = 'home' | 'register' | 'login' | 'dashboard';
@@ -29,19 +35,13 @@ type Page = 'home' | 'register' | 'login' | 'dashboard';
 // Use relative API URL since frontend and backend are on the same server
 const API_URL = '/api';
 
-const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) => {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
+const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, initialPage = 'home' }) => {
+  const [currentPage, setCurrentPage] = useState<Page>(initialPage);
   const [user, setUser] = useState<User | null>(null);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Form states
-  const [registerForm, setRegisterForm] = useState({
-    name: '',
-    email: '',
-    password: ''
-  });
-
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: ''
@@ -61,6 +61,15 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) 
     checkAuth();
   }, []);
 
+  // Handle initial page navigation
+  useEffect(() => {
+    if (initialPage && !isAuthenticated && currentPage === 'home') {
+      // Only set initial page if we're currently on home page
+      // This prevents overriding user navigation
+      setCurrentPage(initialPage);
+    }
+  }, [initialPage, isAuthenticated]);
+
   const checkAuth = () => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -69,39 +78,54 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) 
       setUser(JSON.parse(userData));
       setIsAuthenticated(true);
       setCurrentPage('dashboard');
+      localStorage.setItem('wasLoggedIn', 'true');
       loadWorkouts();
     } else {
       setIsAuthenticated(false);
-      setCurrentPage('home');
+      // Don't automatically redirect to home - preserve current page
+      // Only set to home if we're currently on dashboard (which requires auth)
+      if (currentPage === 'dashboard') {
+        setCurrentPage('home');
+      }
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleRegister = async (userData: {
+    name: string;
+    surname: string;
+    email: string;
+    password: string;
+    gender: string;
+    height: string;
+    weight: string;
+    birthDate: string;
+    GOAL: string;
+  }) => {
     try {
       const response = await fetch(`${API_URL}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(registerForm),
+        body: JSON.stringify(userData),
       });
       
       const data = await response.json();
       
       if (!data.success) {
         alert(data.message);
-        return;
+        return false;
       }
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      setRegisterForm({ name: '', email: '', password: '' });
+      localStorage.setItem('wasLoggedIn', 'true');
       checkAuth();
+      return true;
     } catch (error) {
       console.error('Registration error:', error);
       alert('An error occurred during registration');
+      return false;
     }
   };
 
@@ -126,6 +150,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) 
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('wasLoggedIn', 'true');
       setLoginForm({ email: '', password: '' });
       checkAuth();
     } catch (error) {
@@ -137,6 +162,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('wasLoggedIn');
     setUser(null);
     setIsAuthenticated(false);
     setWorkouts([]);
@@ -342,45 +368,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) 
   );
 
   const renderRegisterPage = () => (
-    <div>
-      <h2 className="mb-4">Register</h2>
-      <form onSubmit={handleRegister}>
-        <div className="mb-3">
-          <label htmlFor="register-name" className="form-label">Name</label>
-          <input 
-            type="text" 
-            className="form-control" 
-            id="register-name" 
-            value={registerForm.name}
-            onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
-            required 
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="register-email" className="form-label">Email</label>
-          <input 
-            type="email" 
-            className="form-control" 
-            id="register-email" 
-            value={registerForm.email}
-            onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
-            required 
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="register-password" className="form-label">Password</label>
-          <input 
-            type="password" 
-            className="form-control" 
-            id="register-password" 
-            value={registerForm.password}
-            onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
-            required 
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">Register</button>
-      </form>
-    </div>
+    <RegisterPage onRegisterSuccess={handleRegister} />
   );
 
   const renderLoginPage = () => (
@@ -561,10 +549,14 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding }) 
 
   return (
     <>
-      {renderNavbar()}
-      <div className="container my-5">
-        {renderCurrentPage()}
-      </div>
+      {currentPage !== 'register' && renderNavbar()}
+      {currentPage === 'register' ? (
+        renderCurrentPage()
+      ) : (
+        <div className="container my-5">
+          {renderCurrentPage()}
+        </div>
+      )}
     </>
   );
 };

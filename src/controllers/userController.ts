@@ -5,7 +5,7 @@ import User, { IUser } from '../models/User';
 // Register a new user
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const { name, surname, email, password, gender, height, weight, birthDate, GOAL } = req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -14,8 +14,18 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Create user
-    const user = await User.create({ name, email, password });
+    // Create user with all fields
+    const user = await User.create({ 
+      name, 
+      surname, 
+      email, 
+      password, 
+      gender, 
+      height, 
+      weight, 
+      birthDate, 
+      GOAL 
+    });
 
     // Generate token
     const token = jwt.sign(
@@ -29,7 +39,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       user: {
         id: user._id,
         name: user.name,
+        surname: user.surname,
         email: user.email,
+        gender: user.gender,
+        height: user.height,
+        weight: user.weight,
+        birthDate: user.birthDate,
+        GOAL: user.GOAL,
       },
       token,
     });
@@ -70,7 +86,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       user: {
         id: user._id,
         name: user.name,
+        surname: user.surname,
         email: user.email,
+        gender: user.gender,
+        height: user.height,
+        weight: user.weight,
+        birthDate: user.birthDate,
+        GOAL: user.GOAL,
       },
       token,
     });

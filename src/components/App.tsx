@@ -6,6 +6,7 @@ type AppPage = 'landing' | 'app';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<AppPage>('landing');
+  const [initialAppPage, setInitialAppPage] = useState<'home' | 'register' | 'login'>('home');
 
   // Check if user is already logged in on app start
   useEffect(() => {
@@ -17,10 +18,12 @@ const App: React.FC = () => {
   }, []);
 
   const handleNavigateToRegister = () => {
+    setInitialAppPage('register');
     setCurrentPage('app');
   };
 
   const handleNavigateToLogin = () => {
+    setInitialAppPage('login');
     setCurrentPage('app');
   };
 
@@ -31,26 +34,15 @@ const App: React.FC = () => {
   // Listen for logout events to return to landing page
   useEffect(() => {
     const handleStorageChange = () => {
-      const token = localStorage.getItem('token');
-      if (!token && currentPage === 'app') {
-        setCurrentPage('landing');
-      }
+      // Only listen for actual logout events, not just absence of token
+      // This prevents redirecting users who are on public pages like register
     };
 
     // Listen for storage events (when localStorage changes)
     window.addEventListener('storage', handleStorageChange);
     
-    // Also check periodically for logout
-    const interval = setInterval(() => {
-      const token = localStorage.getItem('token');
-      if (!token && currentPage === 'app') {
-        setCurrentPage('landing');
-      }
-    }, 1000);
-
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
     };
   }, [currentPage]);
 
@@ -66,6 +58,7 @@ const App: React.FC = () => {
   return (
     <FitnessTracker 
       onNavigateToLanding={handleNavigateToLanding}
+      initialPage={initialAppPage}
     />
   );
 };
