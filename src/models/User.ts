@@ -3,8 +3,14 @@ import bcrypt from 'bcrypt';
 
 export interface IUser extends Document {
   name: string;
+  surname: string;
   email: string;
   password: string;
+  gender: string;
+  height: string;
+  weight: string;
+  birthDate: string;
+  GOAL: string;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -17,6 +23,12 @@ const UserSchema: Schema = new Schema(
       required: [true, 'Please provide a name'],
       maxlength: 50,
       minlength: 3,
+    },
+    surname: {
+      type: String,
+      required: [true, 'Please provide a surname'],
+      maxlength: 50,
+      minlength: 2,
     },
     email: {
       type: String,
@@ -31,6 +43,28 @@ const UserSchema: Schema = new Schema(
       type: String,
       required: [true, 'Please provide a password'],
       minlength: 6,
+    },
+    gender: {
+      type: String,
+      required: [true, 'Please provide your gender'],
+      enum: ['male', 'female', 'other'],
+    },
+    height: {
+      type: String,
+      required: [true, 'Please provide your height'],
+    },
+    weight: {
+      type: String,
+      required: [true, 'Please provide your weight'],
+    },
+    birthDate: {
+      type: String,
+      required: [true, 'Please provide your birth date'],
+    },
+    GOAL: {
+      type: String,
+      required: [true, 'Please provide your fitness goal'],
+      enum: ['weight_loss', 'muscle_gain', 'maintenance', 'endurance', 'strength'],
     },
   },
   { timestamps: true }
