@@ -5,62 +5,62 @@ USER {
     email : string
     password : string
 
-    gender : string     | These are about user's body 
-    height : string    |
-    weight : string     |
-    birthDate: string   |
+    gender : string | These are about user's body 
+    height : string |
+    weight : string |
+    birthDate: string |
 
     GOAL: string
 }
 
-bugün kaç kalori yaktın? 
-kaç kalori aldın
+How many calories did you burn today? 
+How many calories did you take in?
 
-egsersizi seç örn: bisiklet, yürüyüş, koşu
+choose exercise e.g. cycling, walking, jogging
 +
-vakit gir 
+enter time 
 = 
-yakılan kalori 
+calories burned 
 
-alınan kaloriyi gir 
+enter calories in 
 
 
-kişinin bedeninin zaten yaktğı bir kalori var : kişinin bedenine göre hesaplanır
+one's body already burns a calorie: it is calculated according to one's body
 
-kişinin egzersiz ile yaktğı bir kalori var : kullanıcı girecek
-kişinin aldığı kalori var : kullanıcı girecek
+there is a calorie that a person burns with exercise: the user will enter
+There are calories that the person takes in : the user will enter
 
 
 register
-    bilgiler
-    hedef
+    information
+    Target
 
-günlük
-    gün için yaptığı egsersiz ve vakti
-    gün içinde yedikleri 
-    günlük kilo güncelleme (opsyonel)
+daily
+    his exercise and time for the day
+    what they eat during the day 
+    daily weight update (optional)
 
 
-şuanki kilo -----(
+current weight -----(
 
-   verilmesi gereken kalori
+   calories to be given
 
-   egsersiz ile verilmiş olan kalori <--- kalHesap(gender, height, weight, yaş, yapılan egsersiz, egsersiz vakti)
+   calories given by exercise <--- calCalculator(gender, height, weight, age, exercise performed, exercise time)
 
-)-----> hedef kilo
+)-----> target weight
 
 
 
 DATABASE
 
-    USER TABLE: User kaydı ve takibi
-    JOURNEY TABLE: şuanki journey'nin takibi ve günlük hedef için var, şu anki journey'nin
-    DAILYDATA TABLE: OPTIONAL, genel performans takibi için. Günlük performans kaydedilir. Sonra eklenebilir 
+    USER TABLE User registration and tracking
+    JOURNEY TABLE: there is for tracking the current journey and daily target, the current journey
+    DAILYDATA TABLE: OPTIONAL, for general performance tracking. Daily performance is recorded. Can be added later 
 
 
 USER
 {
-    Genel bilgiler {
+    General information {
         name : string
         surname : string
         email : string
@@ -84,10 +84,11 @@ JOURNEY{
 
     DailyData : DAILYDATA[]
 
-    tahimini end date
+    forecast end date
 }
 
 DAILYDATA{  
     date of the day: date as string, 
     daily performance: a number between 1-100,
 }
+

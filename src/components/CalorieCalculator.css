@@ -1,0 +1,335 @@
+.calorie-calculator-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.calculator-content-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Navigation Bar */
+.calculator-navbar {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.calculator-navbar .navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+}
+
+.calculator-navbar .navbar-brand h2 {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.calculator-navbar .navbar-menu {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.calculator-navbar .nav-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calculator-navbar .nav-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.calculator-navbar .nav-button.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.calculator-navbar .nav-button.logout {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+  margin-left: 16px;
+}
+
+.calculator-navbar .nav-button.logout:hover {
+  background: rgba(239, 68, 68, 1);
+}
+
+.calorie-calculator-card {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.calculator-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.back-button:hover {
+  background-color: #f5f5f5;
+}
+
+.calculator-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.calculator-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.bmr-section {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+.bmr-section h3 {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.bmr-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.input-group input,
+.input-group select {
+  padding: 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.exercise-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.exercise-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.basal-burn-rate {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  font-size: 16px;
+  color: #333;
+}
+
+.calculate-button {
+  background: linear-gradient(135deg, #4285f4 0%, #667eea 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.calculate-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+}
+
+.results-section {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #333;
+}
+
+.result-row span:first-child {
+  font-weight: 500;
+}
+
+.result-row span:last-child {
+  font-weight: 600;
+}
+
+.negative {
+  color: #dc3545 !important;
+}
+
+.positive {
+  color: #28a745 !important;
+}
+
+.performance-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.performance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.performance-bar {
+  height: 12px;
+  background: linear-gradient(90deg, #dc3545 0%, #fd7e14 25%, #ffc107 50%, #28a745 75%, #20c997 100%);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.performance-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.performance-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1px;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .calorie-calculator-container {
+    padding: 16px;
+  }
+  
+  .calorie-calculator-card {
+    padding: 24px;
+    border-radius: 20px;
+  }
+  
+  .calculator-title {
+    font-size: 28px;
+  }
+  
+  .exercise-inputs {
+    grid-template-columns: 1fr;
+  }
+  
+  .calculator-header {
+    margin-bottom: 24px;
+  }
+}
+
+/* Animation for smooth transitions */
+.calorie-calculator-card {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import RegisterPage from './RegisterPage';
+import ProfilePage from './ProfilePage';
+import CalorieCalculator from './CalorieCalculator';
+import ProgressDashboard from './ProgressDashboard';
+import MyWorkouts from './MyWorkouts';
 import './FitnessTracker.css';
 
 interface User {
@@ -7,7 +11,6 @@ interface User {
   name: string;
   surname: string;
   email: string;
-  password: string;
   gender: string;
   height: string;
   weight: string;
@@ -30,7 +33,7 @@ interface FitnessTrackerProps {
   initialPage?: 'home' | 'register' | 'login';
 }
 
-type Page = 'home' | 'register' | 'login' | 'dashboard';
+type Page = 'home' | 'register' | 'login' | 'dashboard' | 'profile' | 'calculator' | 'workouts';
 
 // Use relative API URL since frontend and backend are on the same server
 const API_URL = '/api';
@@ -241,19 +244,13 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
   };
 
   const deleteWorkout = async (id: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    
-    if (!window.confirm('Are you sure you want to delete this workout?')) {
-      return;
-    }
-    
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/workouts/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       const data = await response.json();
@@ -263,11 +260,16 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
         return;
       }
       
-      loadWorkouts();
+      // Remove workout from state
+      setWorkouts(workouts.filter(workout => workout._id !== id));
     } catch (error) {
       console.error('Delete workout error:', error);
       alert('An error occurred while deleting the workout');
     }
+  };
+
+  const handleProfileUpdate = (updatedUser: User) => {
+    setUser(updatedUser);
   };
 
   const renderNavbar = () => (
@@ -325,6 +327,33 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
                     onClick={(e) => { e.preventDefault(); setCurrentPage('dashboard'); loadWorkouts(); }}
                   >
                     Dashboard
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a 
+                    className="nav-link" 
+                    href="#" 
+                    onClick={(e) => { e.preventDefault(); setCurrentPage('workouts'); loadWorkouts(); }}
+                  >
+                    Workouts
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a 
+                    className="nav-link" 
+                    href="#" 
+                    onClick={(e) => { e.preventDefault(); setCurrentPage('calculator'); }}
+                  >
+                    Calorie Calculator
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a 
+                    className="nav-link" 
+                    href="#" 
+                    onClick={(e) => { e.preventDefault(); setCurrentPage('profile'); }}
+                  >
+                    Profile
                   </a>
                 </li>
                 <li className="nav-item">
@@ -402,135 +431,53 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     </div>
   );
 
-  const renderWorkoutsList = () => (
-    <div className="list-group">
-      {workouts.length === 0 ? (
-        <div className="text-center py-5">
-          <p>No workouts found. Add your first workout!</p>
-        </div>
-      ) : (
-        workouts.map((workout) => (
-          <div key={workout._id} className={`list-group-item workout-item ${workout.type}`}>
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <h5>{workout.name}</h5>
-                <p className="mb-1">Type: {workout.type.charAt(0).toUpperCase() + workout.type.slice(1)}</p>
-                <p className="mb-1">Duration: {workout.duration} minutes</p>
-                <p className="mb-1">Date: {new Date(workout.date).toLocaleDateString()}</p>
-                {workout.caloriesBurned && <p className="mb-1">Calories: {workout.caloriesBurned}</p>}
-                {workout.notes && <p className="text-muted">{workout.notes}</p>}
-              </div>
-              <div>
-                <button 
-                  className="btn btn-sm btn-outline-danger"
-                  onClick={() => deleteWorkout(workout._id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        ))
-      )}
-    </div>
+  const renderWorkoutsPage = () => (
+    <MyWorkouts />
   );
 
-  const renderDashboardPage = () => (
-    <div>
-      <h2 className="mb-4">Dashboard</h2>
-      <div className="row">
-        <div className="col-md-8">
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3>My Workouts</h3>
-          </div>
-          {renderWorkoutsList()}
-        </div>
-        <div className="col-md-4">
-          <div className="card">
-            <div className="card-header bg-primary text-white">
-              Add New Workout
-            </div>
-            <div className="card-body">
-              <form onSubmit={handleAddWorkout}>
-                <div className="mb-3">
-                  <label htmlFor="workout-name" className="form-label">Name</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    id="workout-name" 
-                    value={workoutForm.name}
-                    onChange={(e) => setWorkoutForm({...workoutForm, name: e.target.value})}
-                    required 
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="workout-type" className="form-label">Type</label>
-                  <select 
-                    className="form-select" 
-                    id="workout-type" 
-                    value={workoutForm.type}
-                    onChange={(e) => setWorkoutForm({...workoutForm, type: e.target.value})}
-                    required
-                  >
-                    <option value="">Select workout type</option>
-                    <option value="cardio">Cardio</option>
-                    <option value="strength">Strength</option>
-                    <option value="flexibility">Flexibility</option>
-                    <option value="sports">Sports</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="workout-duration" className="form-label">Duration (minutes)</label>
-                  <input 
-                    type="number" 
-                    className="form-control" 
-                    id="workout-duration" 
-                    value={workoutForm.duration}
-                    onChange={(e) => setWorkoutForm({...workoutForm, duration: e.target.value})}
-                    required 
-                    min="1" 
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="workout-date" className="form-label">Date</label>
-                  <input 
-                    type="date" 
-                    className="form-control" 
-                    id="workout-date" 
-                    value={workoutForm.date}
-                    onChange={(e) => setWorkoutForm({...workoutForm, date: e.target.value})}
-                    required 
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="workout-calories" className="form-label">Calories Burned</label>
-                  <input 
-                    type="number" 
-                    className="form-control" 
-                    id="workout-calories" 
-                    value={workoutForm.caloriesBurned}
-                    onChange={(e) => setWorkoutForm({...workoutForm, caloriesBurned: e.target.value})}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="workout-notes" className="form-label">Notes</label>
-                  <textarea 
-                    className="form-control" 
-                    id="workout-notes" 
-                    rows={3}
-                    value={workoutForm.notes}
-                    onChange={(e) => setWorkoutForm({...workoutForm, notes: e.target.value})}
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary">Save Workout</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const renderDashboardPage = () => {
+    if (!user) return null;
+    return (
+      <ProgressDashboard 
+        user={user} 
+        workouts={workouts}
+        onNavigate={(page: string) => {
+          setCurrentPage(page as Page);
+          if (page === 'workouts') {
+            loadWorkouts();
+          }
+        }}
+        onLogout={handleLogout}
+      />
+    );
+  };
+
+  const renderProfilePage = () => {
+    if (!user) return null;
+    return (
+      <ProfilePage 
+        user={user} 
+        onProfileUpdate={handleProfileUpdate}
+      />
+    );
+  };
+
+  const renderCalorieCalculatorPage = () => {
+    if (!user) return null;
+    return (
+      <CalorieCalculator 
+        user={user} 
+        onBack={() => setCurrentPage('dashboard')}
+        onNavigate={(page: string) => {
+          setCurrentPage(page as Page);
+          if (page === 'workouts') {
+            loadWorkouts();
+          }
+        }}
+        onLogout={handleLogout}
+      />
+    );
+  };
 
   const renderCurrentPage = () => {
     switch (currentPage) {
@@ -542,6 +489,12 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
         return renderLoginPage();
       case 'dashboard':
         return renderDashboardPage();
+      case 'workouts':
+        return renderWorkoutsPage();
+      case 'profile':
+        return renderProfilePage();
+      case 'calculator':
+        return renderCalorieCalculatorPage();
       default:
         return renderHomePage();
     }

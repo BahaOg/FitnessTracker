@@ -26,8 +26,26 @@ export const createWorkout = async (req: Request, res: Response): Promise<void> 
 export const getUserWorkouts = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId;
+    const { startDate, endDate } = req.query;
     
-    const workouts = await Workout.find({ userId })
+    // Build query filter
+    const filter: any = { userId };
+    
+    // Add date range filter if provided
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) {
+        filter.date.$gte = new Date(startDate as string);
+      }
+      if (endDate) {
+        // Add one day to endDate to include the entire end date
+        const end = new Date(endDate as string);
+        end.setDate(end.getDate() + 1);
+        filter.date.$lt = end;
+      }
+    }
+    
+    const workouts = await Workout.find(filter)
       .sort({ date: -1 });
     
     res.status(200).json({

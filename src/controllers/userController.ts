@@ -122,4 +122,50 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
     console.error('Get current user error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
+};
+
+// Update user profile
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).user.userId;
+    const { name, surname, password, height, weight, GOAL } = req.body;
+
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    // Update fields if provided
+    if (name !== undefined) user.name = name;
+    if (surname !== undefined) user.surname = surname;
+    if (height !== undefined) user.height = height;
+    if (weight !== undefined) user.weight = weight;
+    if (GOAL !== undefined) user.GOAL = GOAL;
+    
+    // Handle password update separately (it needs to be hashed)
+    if (password && password.trim() !== '') {
+      if (password.length < 6) {
+        res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        return;
+      }
+      user.password = password; // The pre-save middleware will hash it
+    }
+
+    // Save the updated user
+    await user.save();
+
+    // Return updated user without password
+    const updatedUser = await User.findById(userId).select('-password');
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error('Update user error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 }; 
