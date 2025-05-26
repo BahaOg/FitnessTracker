@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './MyWorkouts.css';
 
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : '/api';
+// Use relative API URL for both development and production
+// The webpack dev server proxy will forward /api requests to localhost:5000 in development
+const API_URL = '/api';
 
 interface Workout {
   _id: string;

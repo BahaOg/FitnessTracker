@@ -36,8 +36,9 @@ interface FitnessTrackerProps {
 
 type Page = 'home' | 'register' | 'login' | 'dashboard' | 'profile' | 'calculator' | 'workouts';
 
-// Use relative API URL in production, full URL in development
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : '/api';
+// Use relative API URL for both development and production
+// The webpack dev server proxy will forward /api requests to localhost:5000 in development
+const API_URL = '/api';
 
 const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, initialPage = 'home' }) => {
   const [currentPage, setCurrentPage] = useState<Page>(initialPage);
