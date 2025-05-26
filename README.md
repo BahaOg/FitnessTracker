@@ -22,10 +22,11 @@ A comprehensive web application for tracking fitness activities, managing workou
 - **Detailed Analytics**: Track calories burned, duration, and workout patterns
 
 ### 📊 Analytics & Progress Tracking
-- **Progress Dashboard**: Comprehensive dashboard with weight trends, goal progress, and weekly averages
+- **Progress Dashboard**: Comprehensive dashboard with weight trends, goal progress, and total net intake
 - **Calorie Calculator**: BMR calculation with goal-based performance scoring
 - **Performance Metrics**: Goal-specific performance evaluation (1-100 scale)
-- **Visual Charts**: Weight trend visualization and calorie intake tracking
+- **Visual Charts**: Weight trend visualization and weekly averages
+- **Data Synchronization**: Dashboard uses real workout data with estimated calorie intake
 
 ### 🎯 Goal-Based System
 - **Fitness Goals**: Lose weight, gain weight, or maintain weight
@@ -33,7 +34,7 @@ A comprehensive web application for tracking fitness activities, managing workou
   - **Lose Weight**: Rewards calorie deficits (500-750 cal/day optimal)
   - **Gain Weight**: Rewards calorie surpluses (500-750 cal/day optimal)
   - **Maintain Weight**: Rewards maintenance calories (±50 cal optimal)
-- **Progress Tracking**: Real-time feedback on goal achievement
+- **Total Net Intake**: Real-time calculation showing calorie intake minus BMR minus exercise calories
 
 ### 🎨 Modern UI/UX
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
@@ -212,13 +213,13 @@ npm start
 ### Seeding Test Data
 Generate 30 days of mixed workout data for testing:
 ```bash
-npx ts-node src/scripts/seedWorkouts.ts user@example.com
+npx ts-node src/scripts/seedWorkouts.ts test@test.com
 ```
 
 ### Verify Test Data
 Check generated workout data:
 ```bash
-npx ts-node src/scripts/checkWorkouts.ts user@example.com
+npx ts-node src/scripts/checkWorkouts.ts test@test.com
 ```
 
 ### Debug Tools
@@ -250,10 +251,18 @@ For development testing:
 
 ## 🔧 Performance & Optimization
 
+### Dashboard Features
+- **Weight Trend**: Visual chart based on actual workout activity and goal-specific calculations
+- **Goal Progress**: Dynamic progress tracking toward fitness goals
+- **Weekly Averages**: Real-time calculations of intake, burned calories, net calories, and BMR
+- **Total Net Intake**: Daily calculation showing intake minus BMR minus exercise calories
+- **Recent Workouts**: Display of last 5 workouts with full workout history
+
 ### Calorie Calculation
 - **BMR**: Mifflin-St Jeor Equation for accurate metabolic rate
 - **Activity Tracking**: MET-based calorie burn calculation
 - **Goal-Based Scoring**: Intelligent performance metrics
+- **Total Net Intake**: Comprehensive calorie balance calculation
 
 ### Data Management
 - **Efficient Queries**: Optimized MongoDB operations
