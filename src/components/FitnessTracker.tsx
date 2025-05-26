@@ -4,6 +4,7 @@ import ProfilePage from './ProfilePage';
 import CalorieCalculator from './CalorieCalculator';
 import ProgressDashboard from './ProgressDashboard';
 import MyWorkouts from './MyWorkouts';
+import DebugPage from './DebugPage';
 import './FitnessTracker.css';
 import './LoginPage.css';
 
@@ -34,7 +35,7 @@ interface FitnessTrackerProps {
   initialPage?: 'home' | 'register' | 'login';
 }
 
-type Page = 'home' | 'register' | 'login' | 'dashboard' | 'profile' | 'calculator' | 'workouts';
+type Page = 'home' | 'register' | 'login' | 'dashboard' | 'profile' | 'calculator' | 'workouts' | 'debug';
 
 // Use relative API URL for both development and production
 // The webpack dev server proxy will forward /api requests to localhost:5000 in development
@@ -107,6 +108,9 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     GOAL: string;
   }) => {
     try {
+      console.log('Attempting registration with URL:', `${API_URL}/users/register`);
+      console.log('Request data:', userData);
+      
       const response = await fetch(`${API_URL}/users/register`, {
         method: 'POST',
         headers: {
@@ -115,7 +119,20 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
         body: JSON.stringify(userData),
       });
       
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      // Check if response is actually JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const textResponse = await response.text();
+        console.error('Server returned non-JSON response:', textResponse);
+        alert(`Server error: Expected JSON but got ${contentType}. Response: ${textResponse.substring(0, 200)}`);
+        return false;
+      }
+      
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (!data.success) {
         alert(data.message);
@@ -129,7 +146,13 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
       return true;
     } catch (error) {
       console.error('Registration error:', error);
-      alert('An error occurred during registration');
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        alert('Cannot connect to server. Please ensure the backend server is running on port 5000.');
+      } else if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        alert('Server returned invalid response. The backend might not be running properly.');
+      } else {
+        alert(`Registration failed: ${error}`);
+      }
       return false;
     }
   };
@@ -362,6 +385,15 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
                   <a 
                     className="nav-link" 
                     href="#" 
+                    onClick={(e) => { e.preventDefault(); setCurrentPage('debug'); }}
+                  >
+                    Debug
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a 
+                    className="nav-link" 
+                    href="#" 
                     onClick={(e) => { e.preventDefault(); handleLogout(); }}
                   >
                     Logout
@@ -535,6 +567,10 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     );
   };
 
+  const renderDebugPage = () => {
+    return <DebugPage />;
+  };
+
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'home':
@@ -551,6 +587,8 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
         return renderProfilePage();
       case 'calculator':
         return renderCalorieCalculatorPage();
+      case 'debug':
+        return renderDebugPage();
       default:
         return renderHomePage();
     }
