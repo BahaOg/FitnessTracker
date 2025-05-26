@@ -89,8 +89,8 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
       // Don't automatically redirect to home - preserve current page
       // Only set to home if we're currently on dashboard (which requires auth)
       if (currentPage === 'dashboard') {
-        setCurrentPage('home');
-      }
+      setCurrentPage('home');
+    }
     }
   };
 
@@ -246,7 +246,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
 
   const deleteWorkout = async (id: string) => {
     try {
-      const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/workouts/${id}`, {
         method: 'DELETE',
         headers: {
@@ -423,28 +423,28 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
           <div className="form-section">
             <div className="form-group">
               <label htmlFor="login-email">Email Address</label>
-              <input 
-                type="email" 
-                id="login-email" 
+          <input 
+            type="email" 
+            id="login-email" 
                 name="email"
-                value={loginForm.email}
-                onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+            value={loginForm.email}
+            onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
                 placeholder="Enter your email address"
-                required 
-              />
-            </div>
+            required 
+          />
+        </div>
             
             <div className="form-group">
               <label htmlFor="login-password">Password</label>
-              <input 
-                type="password" 
-                id="login-password" 
+          <input 
+            type="password" 
+            id="login-password" 
                 name="password"
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+            value={loginForm.password}
+            onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
                 placeholder="Enter your password"
-                required 
-              />
+            required 
+          />
             </div>
           </div>
           
@@ -463,7 +463,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
               </button>
             </p>
           </div>
-        </form>
+              </form>
       </div>
     </div>
   );
@@ -528,9 +528,9 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
       {currentPage === 'register' || currentPage === 'login' ? (
         renderCurrentPage()
       ) : (
-        <div className="container my-5">
-          {renderCurrentPage()}
-        </div>
+      <div className="container my-5">
+        {renderCurrentPage()}
+      </div>
       )}
     </>
   );
