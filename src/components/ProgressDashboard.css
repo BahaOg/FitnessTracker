@@ -8,7 +8,7 @@
 .dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin: 0 24px 32px 24px;
 }
 
@@ -16,7 +16,27 @@
   font-size: 32px;
   font-weight: 600;
   color: #1f2937;
-  margin: 0;
+  margin: 0 0 8px 0;
+}
+
+.dashboard-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0f9ff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e0f2fe;
+}
+
+.info-icon {
+  font-size: 16px;
+}
+
+.info-text {
+  font-size: 14px;
+  color: #0369a1;
+  font-weight: 500;
 }
 
 .date-range-selector {
@@ -117,41 +137,7 @@
   font-weight: 500;
 }
 
-/* Net Calories */
-.net-calories {
-  grid-column: span 2;
-  grid-row: span 1;
-}
 
-.calories-chart {
-  display: flex;
-  align-items: end;
-  gap: 4px;
-  height: 120px;
-  padding: 0 8px;
-}
-
-.calorie-bar {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  align-items: end;
-}
-
-.bar {
-  width: 100%;
-  min-height: 4px;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-.bar.positive {
-  background-color: #EF4444 !important;
-}
-
-.bar.negative {
-  background-color: #10B981 !important;
-}
 
 /* Weekly Averages */
 .weekly-averages {
@@ -186,11 +172,83 @@
 
 /* Bottom Stats Cards */
 .current-weight,
-.todays-net,
-.yesterdays-performance,
-.days-to-goal {
+.total-net-intake {
   grid-column: span 1;
   text-align: center;
+}
+
+/* Recent Workouts */
+.recent-workouts {
+  grid-column: span 4;
+  grid-row: span 1;
+}
+
+.recent-workouts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.workout-item {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.workout-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.workout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.workout-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.workout-date {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.workout-details {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.workout-duration,
+.workout-calories {
+  font-weight: 500;
+}
+
+.workout-count {
+  text-align: center;
+  margin-top: 12px;
+  padding: 12px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.no-workouts {
+  text-align: center;
+  padding: 24px;
+  color: #9ca3af;
+  font-style: italic;
 }
 
 .stat-value {
@@ -224,15 +282,12 @@
   
   .weight-trend,
   .goal-progress,
-  .net-calories,
   .weekly-averages {
     grid-column: span 2;
   }
   
   .current-weight,
-  .todays-net,
-  .yesterdays-performance,
-  .days-to-goal {
+  .total-net-intake {
     grid-column: span 1;
   }
 }
@@ -252,6 +307,15 @@
     font-size: 28px;
     text-align: center;
   }
+
+  .dashboard-info {
+    align-items: flex-start;
+  }
+
+  .info-text {
+    font-size: 13px;
+    line-height: 1.4;
+  }
   
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -260,12 +324,10 @@
   
   .weight-trend,
   .goal-progress,
-  .net-calories,
   .weekly-averages,
+  .recent-workouts,
   .current-weight,
-  .todays-net,
-  .yesterdays-performance,
-  .days-to-goal {
+  .total-net-intake {
     grid-column: span 1;
   }
   

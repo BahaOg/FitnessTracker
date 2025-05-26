@@ -6,21 +6,36 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-// Generate 30 days of fake workout data
+// Generate 30 days of workout data - half running, half walking, mixed together
 const sampleWorkouts = Array.from({ length: 30 }, (_, index) => {
   const date = new Date();
   date.setDate(date.getDate() - index);
-  const workoutTypes = ['Cycling', 'Walking', 'Jogging', 'Weight Training', 'Swimming'];
-  const type = workoutTypes[Math.floor(Math.random() * workoutTypes.length)];
-  const duration = Math.floor(Math.random() * 30) + 30; // 30-60 minutes
-  const caloriesBurned = Math.floor(Math.random() * 300) + 100; // 100-400 calories
+  
+  // Create a truly mixed pattern of running and walking
+  // Generate a pattern that ensures 50/50 split but mixes them randomly
+  const patterns = [
+    true, false, true, false, true, false, true, false, true, false, // 10 mixed
+    false, true, false, true, false, true, false, true, false, true, // 10 mixed
+    true, true, false, false, true, false, true, false, false, true  // 10 mixed
+  ];
+  const isRunning = patterns[index] ?? (index % 2 === 0);
+  const type = isRunning ? 'Running' : 'Walking';
+  
+  // Duration between 30-120 minutes with some variation
+  const duration = Math.floor(Math.random() * 91) + 30; // 30-120 minutes
+  
+  // Calculate calories based on activity type and duration
+  // Running: ~10-15 calories per minute, Walking: ~3-5 calories per minute
+  const caloriesPerMinute = isRunning ? (Math.random() * 5 + 10) : (Math.random() * 2 + 3);
+  const caloriesBurned = Math.floor(caloriesPerMinute * duration);
+  
   return {
     name: type,
-    type: type === 'Weight Training' ? 'strength' : 'cardio',
+    type: 'cardio',
     duration,
     date,
     caloriesBurned,
-    notes: `${type} workout on ${date.toISOString().split('T')[0]}`
+    notes: `${type} workout - ${duration} minutes on ${date.toISOString().split('T')[0]}`
   };
 });
 

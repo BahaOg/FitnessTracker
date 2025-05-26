@@ -53,7 +53,7 @@ const DebugPage: React.FC = () => {
         height: '180',
         weight: '75',
         birthDate: '1990-01-01',
-        GOAL: 'weight_loss'
+        GOAL: 'lose weight'
       };
 
       const registerResponse = await fetch('/api/users/register', {

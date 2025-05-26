@@ -94,11 +94,11 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     checkAuth();
   }, []);
 
-  // Handle initial page navigation
+  // Handle initial page navigation only for non-authenticated users
   useEffect(() => {
-    if (initialPage && !isAuthenticated && currentPage === 'home') {
-      // Only set initial page if we're currently on home page
-      // This prevents overriding user navigation
+    if (initialPage && !isAuthenticated) {
+      // Only set initial page if user is not authenticated
+      // This prevents overriding authenticated user's default dashboard
       setCurrentPage(initialPage);
     }
   }, [initialPage, isAuthenticated]);
@@ -110,16 +110,19 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     if (token && userData) {
       setUser(JSON.parse(userData));
       setIsAuthenticated(true);
+      // Always redirect authenticated users to dashboard on refresh/mount
       setCurrentPage('dashboard');
       localStorage.setItem('wasLoggedIn', 'true');
       loadWorkouts();
     } else {
       setIsAuthenticated(false);
-      // Don't automatically redirect to home - preserve current page
-      // Only set to home if we're currently on dashboard (which requires auth)
-      if (currentPage === 'dashboard') {
-      setCurrentPage('home');
-    }
+      // If user was previously logged in but token is invalid, redirect to home
+      const wasLoggedIn = localStorage.getItem('wasLoggedIn');
+      if (wasLoggedIn || currentPage === 'dashboard' || currentPage === 'profile' || currentPage === 'calculator' || currentPage === 'workouts') {
+        setCurrentPage('home');
+      }
+      // Clean up any stale authentication state
+      localStorage.removeItem('wasLoggedIn');
     }
   };
 

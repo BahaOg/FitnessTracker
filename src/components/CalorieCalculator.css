@@ -172,6 +172,30 @@
   color: #28a745 !important;
 }
 
+.goal-info-section {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+.goal-info-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.goal-explanation {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.goal-explanation p {
+  margin: 0;
+}
+
 .performance-section {
   display: flex;
   flex-direction: column;
@@ -213,6 +237,20 @@
   border-radius: 1px;
 }
 
+.performance-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.performance-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* Responsive design */
 @media (max-width: 600px) {
   .calorie-calculator-container {
@@ -234,6 +272,16 @@
   
   .calculator-header {
     margin-bottom: 24px;
+  }
+  
+  .performance-legend {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .performance-legend span {
+    justify-content: flex-start;
   }
 }
 

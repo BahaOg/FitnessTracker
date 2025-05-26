@@ -1,156 +1,294 @@
 # Fitness Tracker Application
 
-A web application for tracking fitness activities built with TypeScript, Node.js, Express, and MongoDB.
+A comprehensive web application for tracking fitness activities, managing workouts, and monitoring progress built with React, TypeScript, Node.js, Express, and MongoDB.
 
-## Features
+## ✨ Features
 
-- **User Authentication**: Secure registration and login system
-- **Comprehensive User Profiles**: Complete user registration with personal information, body metrics, and fitness goals
+### 🔐 User Authentication
+- Secure registration and login system with JWT authentication
+- Password hashing with bcrypt
+- Persistent login sessions with automatic redirect to dashboard
+- Secure logout with token cleanup
+
+### 👤 Comprehensive User Management
+- **Complete Registration System**: Collects personal information, body metrics, and fitness goals
+- **User Profiles**: Editable profile page with all user information
+- **Authentication Persistence**: Stay logged in across browser sessions
+
+### 🏋️‍♂️ Workout Management
 - **Workout Tracking**: Log different types of workouts with duration and calories burned
-- **Dashboard**: View and manage your workout history
-- **Responsive Design**: Works on desktop and mobile devices
-- **Modern UI**: Beautiful, intuitive user interface with smooth animations
+- **Workout History**: View and manage complete workout history
+- **Exercise Variety**: Support for multiple exercise types (running, walking, cycling, etc.)
+- **Detailed Analytics**: Track calories burned, duration, and workout patterns
 
-### Registration System
+### 📊 Analytics & Progress Tracking
+- **Progress Dashboard**: Comprehensive dashboard with weight trends, goal progress, and weekly averages
+- **Calorie Calculator**: BMR calculation with goal-based performance scoring
+- **Performance Metrics**: Goal-specific performance evaluation (1-100 scale)
+- **Visual Charts**: Weight trend visualization and calorie intake tracking
 
-The application features a comprehensive registration system that collects:
+### 🎯 Goal-Based System
+- **Fitness Goals**: Lose weight, gain weight, or maintain weight
+- **Performance Scoring**: Intelligent scoring based on user's specific fitness goals
+  - **Lose Weight**: Rewards calorie deficits (500-750 cal/day optimal)
+  - **Gain Weight**: Rewards calorie surpluses (500-750 cal/day optimal)
+  - **Maintain Weight**: Rewards maintenance calories (±50 cal optimal)
+- **Progress Tracking**: Real-time feedback on goal achievement
 
-**Personal Information:**
-- First Name and Last Name
-- Email Address
-- Password (minimum 6 characters)
-- Birth Date
+### 🎨 Modern UI/UX
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Beautiful Interface**: Modern design with smooth animations and gradients
+- **Intuitive Navigation**: Easy-to-use navbar with role-based menu items
+- **Form Validation**: Real-time validation with helpful error messages
 
-**Body Information:**
-- Gender (Male, Female, Other)
-- Height (flexible format: cm, feet/inches)
-- Weight (flexible format: kg, lbs)
-
-**Fitness Goals:**
-- Weight Loss
-- Muscle Gain
-- Maintenance
-- Endurance
-- Strength
-
-The registration form includes real-time validation, error handling, and a modern, responsive design that works across all devices.
-
-## Technologies Used
-
-### Backend
-- Node.js with Express
-- TypeScript
-- MongoDB with Mongoose
-- JWT for authentication
-- bcrypt for password hashing
+## 🛠️ Technology Stack
 
 ### Frontend
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-- Bootstrap 5
-- Fetch API for AJAX requests
+- **React 18** with TypeScript
+- **CSS3** with modern features (Grid, Flexbox, Animations)
+- **Webpack** with development server and proxy configuration
+- **Responsive Design** with mobile-first approach
 
-## Project Structure
+### Backend
+- **Node.js** with **Express.js**
+- **TypeScript** for type safety
+- **MongoDB** with **Mongoose** ODM
+- **JWT** for authentication
+- **bcrypt** for password hashing
+- **CORS** support for cross-origin requests
+
+### Development Tools
+- **Hot Reload** for both frontend and backend
+- **Proxy Configuration** for seamless API integration
+- **Fallback Mechanisms** for robust development experience
+- **Debug Tools** for connection testing and troubleshooting
+
+## 📁 Project Structure
 
 ```
 fitness-tracker/
 ├── src/
-│   ├── controllers/      # API controllers
-│   ├── models/           # Database models
-│   ├── routes/           # API routes
-│   ├── middleware/       # Express middleware
-│   ├── docs/             # Documentation
-│   └── index.ts          # Entry point
-├── public/               # Frontend files
-│   ├── index.html        # Main HTML
-│   ├── app.js            # Frontend JavaScript
-│   └── styles.css        # CSS styles
-├── .env                  # Environment variables
-├── package.json          # Dependencies
-└── tsconfig.json         # TypeScript configuration
+│   ├── components/           # React components
+│   │   ├── App.tsx          # Main app component
+│   │   ├── FitnessTracker.tsx # Main tracker component
+│   │   ├── RegisterPage.tsx  # User registration
+│   │   ├── ProfilePage.tsx   # User profile management
+│   │   ├── ProgressDashboard.tsx # Analytics dashboard
+│   │   ├── CalorieCalculator.tsx # BMR & calorie tracking
+│   │   ├── MyWorkouts.tsx    # Workout management
+│   │   ├── DebugPage.tsx     # Development debugging
+│   │   └── *.css            # Component stylesheets
+│   ├── controllers/          # API controllers
+│   │   ├── userController.ts # User authentication & management
+│   │   └── workoutController.ts # Workout CRUD operations
+│   ├── models/              # Database models
+│   │   ├── User.ts          # User schema with validation
+│   │   └── Workout.ts       # Workout schema
+│   ├── routes/              # API routes
+│   │   ├── userRoutes.ts    # User endpoints
+│   │   └── workoutRoutes.ts # Workout endpoints
+│   ├── middleware/          # Express middleware
+│   │   └── authMiddleware.ts # JWT authentication
+│   ├── scripts/             # Utility scripts
+│   │   ├── seedWorkouts.ts  # Seed test data
+│   │   └── checkWorkouts.ts # Verify data
+│   └── index.ts            # Server entry point
+├── public/                  # Static assets
+├── webpack.config.js        # Webpack configuration
+├── package.json            # Dependencies and scripts
+├── tsconfig.json           # TypeScript configuration
+└── .env                    # Environment variables
 ```
 
-## Installation
+## 🚀 Installation & Setup
 
-1. Clone the repository:
-```
+### Prerequisites
+- **Node.js** (v14 or higher)
+- **MongoDB** (local installation or Atlas cloud)
+- **npm** or **yarn**
+
+### 1. Clone the Repository
+```bash
 git clone <repository-url>
+cd fitness-tracker
 ```
 
-2. Install dependencies:
-```
+### 2. Install Dependencies
+```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory with the following environment variables:
-```
+### 3. Environment Configuration
+Create a `.env` file in the root directory:
+
+```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/fitness-tracker
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET=your_super_secure_jwt_secret_key_here
 NODE_ENV=development
 ```
 
-4. Make sure MongoDB is running on your system.
+### 4. Database Setup
+Ensure MongoDB is running on your system:
+- **Local MongoDB**: Start mongod service
+- **MongoDB Atlas**: Use cloud connection string in MONGODB_URI
 
-5. Build the TypeScript code:
-```
+### 5. Build TypeScript
+```bash
 npm run build
 ```
 
-## Running the Application
+## 🏃‍♂️ Running the Application
 
-1. Start the server:
-```
-npm start
-```
+### Development Mode (Recommended)
 
-2. For development with auto-reload:
+**Option 1: Run Both Servers Simultaneously**
+```bash
+npm run dev:fullstack
 ```
+This starts both backend (port 5000) and frontend (port 3000) servers with hot reload.
+
+**Option 2: Run Servers Separately**
+
+Backend only:
+```bash
 npm run dev
 ```
 
-3. Access the application in your browser at:
+Frontend only:
+```bash
+npm run dev:react
 ```
-http://localhost:5000
+
+### Production Mode
+```bash
+npm start
 ```
 
-## API Endpoints
+### Access Points
+- **Frontend**: http://localhost:3000 (development) or http://localhost:5000 (production)
+- **API**: http://localhost:5000/api
+- **Health Check**: http://localhost:5000/api/health
 
-The application provides the following RESTful API endpoints:
+## 🔗 API Endpoints
 
-### User Routes
+### User Authentication
+- `POST /api/users/register` - Register new user with complete profile
+- `POST /api/users/login` - Login existing user
+- `GET /api/users/me` - Get current user profile (protected)
+- `PUT /api/users/me` - Update user profile (protected)
 
-- `POST /api/users/register` - Register a new user
-- `POST /api/users/login` - Login an existing user
-- `GET /api/users/me` - Get the current user information (protected)
+### Workout Management (All Protected)
+- `GET /api/workouts` - Get all workouts for authenticated user
+- `POST /api/workouts` - Create new workout
+- `GET /api/workouts/:id` - Get specific workout
+- `PUT /api/workouts/:id` - Update specific workout
+- `DELETE /api/workouts/:id` - Delete specific workout
 
-### Workout Routes (all protected)
+### Health & Debug
+- `GET /api/health` - Server health check
+- Debug tools available in development mode
 
-- `GET /api/workouts` - Get all workouts for the logged-in user
-- `POST /api/workouts` - Create a new workout
-- `GET /api/workouts/:id` - Get a specific workout
-- `PUT /api/workouts/:id` - Update a specific workout
-- `DELETE /api/workouts/:id` - Delete a specific workout
+## 📝 User Registration Fields
 
-## Testing the API with Postman
+### Personal Information
+- **Name & Surname**: Full name
+- **Email**: Unique identifier with validation
+- **Password**: Minimum 6 characters with hashing
+- **Birth Date**: For age calculation in BMR
 
-1. Import the provided Postman collection (or create a new collection)
-2. Use the provided endpoints
-3. For protected routes, make sure to include the JWT token in the Authorization header:
-   - Type: Bearer Token
-   - Token: `<your-jwt-token>` (obtained from login/register response)
+### Body Information
+- **Gender**: Male or Female (affects BMR calculation)
+- **Height**: Flexible format support (cm, feet/inches)
+- **Weight**: Flexible format support (kg, lbs)
 
-## Architecture
+### Fitness Goals
+- **Lose Weight**: Optimized for calorie deficit tracking
+- **Gain Weight**: Optimized for calorie surplus tracking
+- **Maintain Weight**: Optimized for maintenance calorie tracking
 
-The application follows the MVC (Model-View-Controller) architecture pattern:
+## 🧪 Testing & Development
 
-- **Models**: Define data structure and handle database interactions
-- **Controllers**: Handle business logic and request processing
-- **Views**: Present data to users (implemented as frontend HTML/JS)
+### Seeding Test Data
+Generate 30 days of mixed workout data for testing:
+```bash
+npx ts-node src/scripts/seedWorkouts.ts user@example.com
+```
 
-For more details, see the architectural documentation in `src/docs/architecture.md`.
+### Verify Test Data
+Check generated workout data:
+```bash
+npx ts-node src/scripts/checkWorkouts.ts user@example.com
+```
 
-## License
+### Debug Tools
+- Built-in debug page accessible from navbar when logged in
+- Connection testing tools for troubleshooting API issues
+- Automatic proxy fallback for development environment
 
-This project is for educational purposes only. 
+### Test User
+For development testing:
+- **Email**: test@test.com
+- **Password**: test123
+- **Pre-seeded with 30 days of mixed running/walking workouts**
+
+## 🏗️ Architecture
+
+### Design Patterns
+- **MVC Architecture**: Clear separation of concerns
+- **Component-Based**: Reusable React components
+- **RESTful API**: Standard HTTP methods and status codes
+- **JWT Authentication**: Stateless authentication system
+
+### Key Features
+- **Responsive Design**: Mobile-first approach
+- **Real-time Validation**: Immediate feedback on forms
+- **Persistent Authentication**: Automatic login restoration
+- **Proxy Configuration**: Seamless development experience
+- **Error Handling**: Comprehensive error management
+- **Type Safety**: Full TypeScript implementation
+
+## 🔧 Performance & Optimization
+
+### Calorie Calculation
+- **BMR**: Mifflin-St Jeor Equation for accurate metabolic rate
+- **Activity Tracking**: MET-based calorie burn calculation
+- **Goal-Based Scoring**: Intelligent performance metrics
+
+### Data Management
+- **Efficient Queries**: Optimized MongoDB operations
+- **User-Specific Data**: Secure data isolation
+- **Caching**: Local storage for authentication state
+
+## 🆘 Troubleshooting
+
+### Common Issues
+- **Port Conflicts**: Backend (5000) and Frontend (3000) must be available
+- **MongoDB Connection**: Ensure MongoDB service is running
+- **Proxy Issues**: Development tools include automatic fallback
+- **Authentication**: Check token validity and localStorage
+
+### Debug Tools
+- Use built-in Debug page for connection testing
+- Check console logs for detailed error information
+- Verify environment variables and MongoDB connection
+
+## 📄 License
+
+This project is for educational and demonstration purposes.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📞 Support
+
+For issues and questions:
+- Check the built-in Debug page
+- Review console logs
+- Verify environment configuration
+- Ensure all services are running 

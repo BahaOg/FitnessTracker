@@ -128,9 +128,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
 
   const formatGoalDisplay = (goal: string) => {
     switch (goal) {
-      case 'weight_loss': return 'Lose weight';
-      case 'muscle_gain': return 'Muscle gain';
-      case 'maintenance': return 'Maintenance';
+      case 'lose weight': return 'Lose weight';
+      case 'gain weight': return 'Gain weight';
+      case 'maintain weight': return 'Maintain weight';
       default: return goal;
     }
   };
@@ -275,9 +275,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
               className={errors.GOAL ? 'error' : ''}
             >
               <option value="">Select your fitness goal</option>
-              <option value="weight_loss">Lose weight</option>
-              <option value="muscle_gain">Muscle gain</option>
-              <option value="maintenance">Maintenance</option>
+                                  <option value="lose weight">Lose weight</option>
+              <option value="gain weight">Gain weight</option>
+              <option value="maintain weight">Maintain weight</option>
             </select>
             {errors.GOAL && <span className="error-message">{errors.GOAL}</span>}
           </div>

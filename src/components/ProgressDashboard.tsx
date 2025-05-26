@@ -50,14 +50,15 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
   const [calorieData, setCalorieData] = useState<CalorieEntry[]>([]);
   const [currentWeight, setCurrentWeight] = useState<number>(0);
   const [goalProgress, setGoalProgress] = useState<number>(0);
-  const [todayNetCalories, setTodayNetCalories] = useState<number>(0);
+  const [todayNetIntake, setTodayNetIntake] = useState<number>(0);
   const [weeklyAverages, setWeeklyAverages] = useState({
     intake: 0,
     burned: 0,
     net: 0,
     bmr: 0
   });
-  const [estimatedDaysToGoal, setEstimatedDaysToGoal] = useState<number>(0);
+
+
 
   // Calculate BMR
   const calculateBMR = (): number => {
@@ -83,7 +84,7 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
     return Math.round(bmrValue);
   };
 
-  // Generate mock weight data (in a real app, this would come from user entries)
+  // Generate weight data based on actual workout activity
   const generateWeightData = (): WeightEntry[] => {
     const data: WeightEntry[] = [];
     const startWeight = parseFloat(user.weight);
@@ -92,14 +93,44 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
     
     const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     
+    // Calculate total calories burned in the period to determine realistic weight change
+    const totalCaloriesBurned = workouts
+      .filter(w => {
+        const workoutDate = new Date(w.date);
+        return workoutDate >= startDate && workoutDate <= endDate;
+      })
+      .reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
+    
+    // Calculate realistic weight change based on actual workouts and goal
+    let totalWeightChange = 0;
+    if (totalCaloriesBurned > 0) {
+      switch (user.GOAL) {
+        case 'lose weight':
+          // 1 kg ≈ 7700 calories, workouts contribute to weight loss
+          totalWeightChange = -(totalCaloriesBurned / 7700) * 0.7; // 70% efficiency
+          break;
+        case 'gain weight':
+          // With workouts, weight gain is more muscle-focused
+          totalWeightChange = (totalCaloriesBurned / 7700) * 0.3; // Muscle building
+          break;
+        case 'maintain weight':
+          // Small fluctuations around maintenance
+          totalWeightChange = 0;
+          break;
+      }
+    }
+    
     for (let i = 0; i <= daysDiff; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       
-      // Simulate weight fluctuation (in real app, this would be actual user data)
-      const weightVariation = (Math.random() - 0.5) * 2; // ±1kg variation
-      const trendFactor = user.GOAL === 'weight_loss' ? -0.1 : user.GOAL === 'muscle_gain' ? 0.05 : 0;
-      const weight = startWeight + (i * trendFactor) + weightVariation;
+      // Progressive weight change based on workout progress
+      const progressRatio = i / daysDiff;
+      const currentWeightChange = totalWeightChange * progressRatio;
+      
+      // Small daily fluctuations (±0.3kg)
+      const dailyFluctuation = (Math.random() - 0.5) * 0.6;
+      const weight = startWeight + currentWeightChange + dailyFluctuation;
       
       data.push({
         date: currentDate.toISOString().split('T')[0],
@@ -110,7 +141,7 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
     return data;
   };
 
-  // Generate mock calorie data
+  // Generate calorie data based on actual workouts only
   const generateCalorieData = (): CalorieEntry[] => {
     const data: CalorieEntry[] = [];
     const startDate = new Date(dateRange.start);
@@ -124,84 +155,55 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
       currentDate.setDate(startDate.getDate() + i);
       const dateStr = currentDate.toISOString().split('T')[0];
       
-      // Find workouts for this date
-      const dayWorkouts = workouts.filter(w => w.date.split('T')[0] === dateStr);
+      // Find actual workouts for this date from the workouts prop
+      const dayWorkouts = workouts.filter(w => {
+        const workoutDate = new Date(w.date).toISOString().split('T')[0];
+        return workoutDate === dateStr;
+      });
       const caloriesBurned = dayWorkouts.reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
       
-      // Simulate calorie intake (in real app, this would be user input)
-      const baseIntake = bmr + (Math.random() * 400 - 200); // BMR ± 200 calories
-      const intake = Math.round(baseIntake);
+      // Use goal-appropriate calorie intake for today only, others show maintenance
+      let intake: number;
+      const today = new Date().toISOString().split('T')[0];
+      
+      if (dateStr === today) {
+        // Today's intake based on goal
+        switch (user.GOAL) {
+          case 'lose weight':
+            intake = bmr + caloriesBurned - 625; // Target deficit
+            break;
+          case 'gain weight':
+            intake = bmr + caloriesBurned + 625; // Target surplus
+            break;
+          case 'maintain weight':
+            intake = bmr + caloriesBurned; // Maintenance
+            break;
+          default:
+            intake = bmr + caloriesBurned;
+        }
+      } else {
+        // For other days, use maintenance calories for consistency
+        intake = bmr + caloriesBurned;
+      }
+      
       const net = intake - bmr - caloriesBurned;
       
       data.push({
         date: dateStr,
-        intake,
-        burned: caloriesBurned,
-        net
+        intake: Math.round(intake),
+        burned: caloriesBurned, // Real workout data
+        net: Math.round(net)
       });
     }
     
     return data;
   };
 
-  // Calculate goal progress
-  const calculateGoalProgress = (): number => {
-    if (!weightData.length) return 0;
-    
-    const startWeight = weightData[0].weight;
-    const currentWeight = weightData[weightData.length - 1].weight;
-    const targetWeight = user.GOAL === 'weight_loss' ? startWeight - 10 : 
-                        user.GOAL === 'muscle_gain' ? startWeight + 5 : startWeight;
-    
-    const progress = Math.abs(currentWeight - startWeight) / Math.abs(targetWeight - startWeight) * 100;
-    return Math.min(100, Math.max(0, progress));
-  };
 
-  // Calculate weekly averages
-  const calculateWeeklyAverages = () => {
-    if (!calorieData.length) return;
-    
-    const bmr = calculateBMR();
-    const totalIntake = calorieData.reduce((sum, entry) => sum + entry.intake, 0);
-    const totalBurned = calorieData.reduce((sum, entry) => sum + entry.burned, 0);
-    const totalNet = calorieData.reduce((sum, entry) => sum + entry.net, 0);
-    
-    const days = calorieData.length;
-    
-    setWeeklyAverages({
-      intake: Math.round(totalIntake / days),
-      burned: Math.round(totalBurned / days),
-      net: Math.round(totalNet / days),
-      bmr
-    });
-  };
 
-  // Calculate estimated days to goal
-  const calculateEstimatedDaysToGoal = (): number => {
-    if (!weightData.length || weightData.length < 7) return 0;
-    
-    const recentWeightData = weightData.slice(-7); // Last 7 days
-    const weightChange = recentWeightData[recentWeightData.length - 1].weight - recentWeightData[0].weight;
-    const dailyWeightChange = weightChange / 7;
-    
-    if (Math.abs(dailyWeightChange) < 0.01) return 999; // No significant change
-    
-    const currentWeight = parseFloat(user.weight);
-    const targetWeight = user.GOAL === 'weight_loss' ? currentWeight - 10 : 
-                        user.GOAL === 'muscle_gain' ? currentWeight + 5 : currentWeight;
-    
-    const remainingWeight = Math.abs(targetWeight - currentWeight);
-    const daysToGoal = remainingWeight / Math.abs(dailyWeightChange);
-    
-    return Math.round(daysToGoal);
-  };
 
-  // Get today's net calories
-  const getTodayNetCalories = (): number => {
-    const today = new Date().toISOString().split('T')[0];
-    const todayData = calorieData.find(entry => entry.date === today);
-    return todayData ? todayData.net : 0;
-  };
+
+
 
   useEffect(() => {
     const weights = generateWeightData();
@@ -210,11 +212,47 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
     setWeightData(weights);
     setCalorieData(calories);
     setCurrentWeight(parseFloat(user.weight));
-    setGoalProgress(calculateGoalProgress());
-    setTodayNetCalories(getTodayNetCalories());
-    setEstimatedDaysToGoal(calculateEstimatedDaysToGoal());
     
-    calculateWeeklyAverages();
+    // Calculate goal progress
+    if (weights.length > 0) {
+      const startWeight = weights[0].weight;
+      const currentWeight = weights[weights.length - 1].weight;
+              const targetWeight = user.GOAL === 'lose weight' ? startWeight - 10 : 
+                          user.GOAL === 'gain weight' ? startWeight + 5 : startWeight;
+      const progress = Math.abs(currentWeight - startWeight) / Math.abs(targetWeight - startWeight) * 100;
+      setGoalProgress(Math.min(100, Math.max(0, progress)));
+    }
+    
+    // Calculate today's net intake (intake - BMR - calories burned)
+    const today = new Date().toISOString().split('T')[0];
+    const todayData = calories.find(entry => entry.date === today);
+    const bmr = calculateBMR();
+    if (todayData) {
+      const netIntake = todayData.intake - bmr - todayData.burned;
+      setTodayNetIntake(netIntake);
+    } else {
+      setTodayNetIntake(0);
+    }
+    
+
+    
+
+    
+    // Calculate weekly averages
+    if (calories.length > 0) {
+      const bmr = calculateBMR();
+      const totalIntake = calories.reduce((sum, entry) => sum + entry.intake, 0);
+      const totalBurned = calories.reduce((sum, entry) => sum + entry.burned, 0);
+      const totalNet = calories.reduce((sum, entry) => sum + entry.net, 0);
+      const days = calories.length;
+      
+      setWeeklyAverages({
+        intake: Math.round(totalIntake / days),
+        burned: Math.round(totalBurned / days),
+        net: Math.round(totalNet / days),
+        bmr
+      });
+    }
   }, [dateRange, user, workouts]);
 
   const formatDate = (dateStr: string): string => {
@@ -232,7 +270,16 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
   return (
     <div className="progress-dashboard">
       <div className="dashboard-header">
-        <h1>Progress Dashboard</h1>
+        <div>
+          <h1>Progress Dashboard</h1>
+          <div className="dashboard-info">
+            <span className="info-icon">📊</span>
+            <span className="info-text">
+              Workout data is from your actual recorded exercises. 
+              Calorie intake is estimated based on your fitness goal.
+            </span>
+          </div>
+        </div>
         <div className="date-range-selector">
           <input
             type="date"
@@ -307,23 +354,7 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
           </div>
         </div>
 
-        {/* Net Calories */}
-        <div className="dashboard-card net-calories">
-          <h3>Net Calories</h3>
-          <div className="calories-chart">
-            {calorieData.slice(-14).map((entry, index) => (
-              <div key={entry.date} className="calorie-bar">
-                <div 
-                  className={`bar ${entry.net >= 0 ? 'positive' : 'negative'}`}
-                  style={{ 
-                    height: `${Math.min(Math.abs(entry.net) / 20, 100)}%`,
-                    backgroundColor: entry.net >= 0 ? '#EF4444' : '#10B981'
-                  }}
-                ></div>
-              </div>
-            ))}
-          </div>
-        </div>
+
 
         {/* Weekly Averages */}
         <div className="dashboard-card weekly-averages">
@@ -354,21 +385,46 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
           <div className="stat-value">{currentWeight} <span className="unit">kg</span></div>
         </div>
 
-        <div className="dashboard-card todays-net">
-          <h3>Today's Net Calories</h3>
-          <div className={`stat-value ${todayNetCalories >= 0 ? 'positive' : 'negative'}`}>
-            {todayNetCalories > 0 ? '+' : ''}{todayNetCalories} <span className="unit">kcal</span>
+        <div className="dashboard-card total-net-intake">
+          <h3>Total Net Intake</h3>
+          <div className={`stat-value ${todayNetIntake >= 0 ? 'positive' : 'negative'}`}>
+            {todayNetIntake > 0 ? '+' : ''}{todayNetIntake.toLocaleString()} <span className="unit">kcal</span>
           </div>
         </div>
 
-        <div className="dashboard-card yesterdays-performance">
-          <h3>Yesterday's Performance</h3>
-          <div className="stat-value">85</div>
-        </div>
 
-        <div className="dashboard-card days-to-goal">
-          <h3>Estimated Days to Goal</h3>
-          <div className="stat-value">{estimatedDaysToGoal > 999 ? '∞' : estimatedDaysToGoal}</div>
+
+
+
+        {/* Recent Workouts */}
+        <div className="dashboard-card recent-workouts">
+          <h3>Recent Workouts</h3>
+          <div className="recent-workouts-list">
+            {workouts.length === 0 ? (
+              <div className="no-workouts">No workouts recorded yet</div>
+            ) : (
+              workouts
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .slice(0, 5)
+                .map((workout) => (
+                  <div key={workout._id} className="workout-item">
+                    <div className="workout-header">
+                      <span className="workout-name">{workout.name}</span>
+                      <span className="workout-date">{formatDate(workout.date)}</span>
+                    </div>
+                    <div className="workout-details">
+                      <span className="workout-duration">{workout.duration} min</span>
+                      <span className="workout-calories">{workout.caloriesBurned || 0} kcal</span>
+                    </div>
+                  </div>
+                ))
+            )}
+          </div>
+          {workouts.length > 5 && (
+            <div className="workout-count">
+              +{workouts.length - 5} more workouts (total: {workouts.length})
+            </div>
+          )}
         </div>
       </div>
     </div>

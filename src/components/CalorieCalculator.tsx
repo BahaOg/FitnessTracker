@@ -98,22 +98,89 @@ const CalorieCalculator: React.FC<CalorieCalculatorProps> = ({ user }) => {
     // Calculate net calories (intake - BMR - exercise calories)
     const netCalories = intake - basalRate - burned;
     
-    // Performance calculation based on goal and net calories
-    // Ideal range: -500 to +500 calories from maintenance
-    const idealRange = 500;
-    const deviation = Math.abs(netCalories);
-    
+    // Goal-based performance calculation
     let score: number;
-    if (deviation <= idealRange) {
-      // Good performance if within ideal range
-      score = 100 - (deviation / idealRange) * 25; // 75-100 range
-    } else {
-      // Lower performance if outside ideal range
-      const excessDeviation = deviation - idealRange;
-      score = 75 - Math.min(excessDeviation / 100, 74); // 1-75 range
+    
+    switch (user.GOAL) {
+      case 'lose weight':
+        if (netCalories > 0) {
+          // Positive net calories are bad for weight loss (eating too much)
+          // Scale from 1-25 based on how much surplus
+          score = Math.max(1, 25 - Math.min(netCalories / 50, 24));
+        } else {
+          // Negative net calories are good for weight loss
+          const deficit = Math.abs(netCalories);
+          if (deficit >= 500 && deficit <= 750) {
+            // Excellent range: 76-100 points
+            score = 76 + ((750 - Math.abs(deficit - 625)) / 125) * 24;
+          } else if (deficit >= 300 && deficit <= 900) {
+            // Good range: 51-75 points
+            const distanceFromIdeal = Math.min(Math.abs(deficit - 625) - 125, 275);
+            score = 75 - (distanceFromIdeal / 275) * 24;
+          } else if (deficit >= 100 && deficit <= 1200) {
+            // Mid range: 26-50 points
+            const distanceFromIdeal = Math.min(Math.abs(deficit - 625) - 400, 475);
+            score = 50 - (distanceFromIdeal / 475) * 24;
+          } else {
+            // Poor range: 1-25 points
+            const distanceFromIdeal = Math.abs(deficit - 625);
+            score = Math.max(1, 25 - Math.min((distanceFromIdeal - 875) / 50, 24));
+          }
+        }
+        break;
+        
+      case 'gain weight':
+        if (netCalories < 0) {
+          // Negative net calories are bad for weight gain (eating too little)
+          // Scale from 1-25 based on how much deficit
+          const deficit = Math.abs(netCalories);
+          score = Math.max(1, 25 - Math.min(deficit / 50, 24));
+        } else {
+          // Positive net calories are good for weight gain
+          const surplus = netCalories;
+          if (surplus >= 500 && surplus <= 750) {
+            // Excellent range: 76-100 points
+            score = 76 + ((750 - Math.abs(surplus - 625)) / 125) * 24;
+          } else if (surplus >= 300 && surplus <= 900) {
+            // Good range: 51-75 points
+            const distanceFromIdeal = Math.min(Math.abs(surplus - 625) - 125, 275);
+            score = 75 - (distanceFromIdeal / 275) * 24;
+          } else if (surplus >= 100 && surplus <= 1200) {
+            // Mid range: 26-50 points
+            const distanceFromIdeal = Math.min(Math.abs(surplus - 625) - 400, 475);
+            score = 50 - (distanceFromIdeal / 475) * 24;
+          } else {
+            // Poor range: 1-25 points
+            const distanceFromIdeal = Math.abs(surplus - 625);
+            score = Math.max(1, 25 - Math.min((distanceFromIdeal - 875) / 50, 24));
+          }
+        }
+        break;
+        
+      case 'maintain weight':
+        // Ideal: 0 net calories (perfect maintenance)
+        const deviation = Math.abs(netCalories);
+        if (deviation <= 50) {
+          // Excellent range: 76-100 points
+          score = 100 - (deviation / 50) * 24;
+        } else if (deviation <= 150) {
+          // Good range: 51-75 points
+          score = 75 - ((deviation - 50) / 100) * 24;
+        } else if (deviation <= 300) {
+          // Mid range: 26-50 points
+          score = 50 - ((deviation - 150) / 150) * 24;
+        } else {
+          // Poor range: 1-25 points
+          score = Math.max(1, 25 - Math.min((deviation - 300) / 50, 24));
+        }
+        break;
+        
+      default:
+        // Default to maintenance if goal is not recognized
+        score = 50;
     }
     
-    return Math.max(1, Math.round(score));
+    return Math.max(1, Math.min(100, Math.round(score)));
   };
 
   // Update calculations when inputs change
@@ -145,10 +212,10 @@ const CalorieCalculator: React.FC<CalorieCalculatorProps> = ({ user }) => {
   };
 
   const getPerformanceColor = (score: number): string => {
-    if (score >= 80) return '#4CAF50'; // Green
-    if (score >= 60) return '#FFC107'; // Yellow
-    if (score >= 40) return '#FF9800'; // Orange
-    return '#F44336'; // Red
+    if (score >= 76) return '#4CAF50'; // Green - Excellent
+    if (score >= 51) return '#FFC107'; // Yellow - Good
+    if (score >= 26) return '#FF9800'; // Orange - Mid
+    return '#F44336'; // Red - Poor
   };
 
   return (
@@ -241,6 +308,21 @@ const CalorieCalculator: React.FC<CalorieCalculatorProps> = ({ user }) => {
               </div>
             </div>
             
+            <div className="goal-info-section">
+              <h3>Goal: {user.GOAL.charAt(0).toUpperCase() + user.GOAL.slice(1)}</h3>
+              <div className="goal-explanation">
+                {user.GOAL === 'lose weight' && (
+                  <p>For weight loss, aim for a calorie deficit of 500-750 calories daily.</p>
+                )}
+                {user.GOAL === 'gain weight' && (
+                  <p>For weight gain, aim for a calorie surplus of 500-750 calories daily.</p>
+                )}
+                {user.GOAL === 'maintain weight' && (
+                  <p>For weight maintenance, aim for a net calorie intake close to 0.</p>
+                )}
+              </div>
+            </div>
+            
             <div className="performance-section">
               <div className="performance-header">
                 <span>Performance</span>
@@ -254,6 +336,12 @@ const CalorieCalculator: React.FC<CalorieCalculatorProps> = ({ user }) => {
                     backgroundColor: getPerformanceColor(performance)
                   }}
                 ></div>
+              </div>
+              <div className="performance-legend">
+                <span style={{ color: '#4CAF50' }}>■ Excellent (76-100)</span>
+                <span style={{ color: '#FFC107' }}>■ Good (51-75)</span>
+                <span style={{ color: '#FF9800' }}>■ Mid (26-50)</span>
+                <span style={{ color: '#F44336' }}>■ Poor (1-25)</span>
               </div>
             </div>
           </div>

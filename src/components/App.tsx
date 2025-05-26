@@ -13,8 +13,10 @@ const App: React.FC = () => {
     const token = localStorage.getItem('token');
     const wasLoggedIn = localStorage.getItem('wasLoggedIn');
     if (token && wasLoggedIn === 'true') {
-      // If user is logged in, go directly to the app
+      // If user is logged in, go directly to the app with default home page
+      // FitnessTracker will handle redirecting to dashboard for authenticated users
       setCurrentPage('app');
+      setInitialAppPage('home'); // Reset to home - auth will handle dashboard redirect
     }
   }, []);
 

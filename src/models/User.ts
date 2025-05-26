@@ -64,7 +64,7 @@ const UserSchema: Schema = new Schema(
     GOAL: {
       type: String,
       required: [true, 'Please provide your fitness goal'],
-      enum: ['weight_loss', 'muscle_gain', 'maintenance'],
+      enum: ['lose weight', 'gain weight', 'maintain weight'],
     },
   },
   { timestamps: true }
