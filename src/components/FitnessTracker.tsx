@@ -39,13 +39,40 @@ type Page = 'home' | 'register' | 'login' | 'dashboard' | 'profile' | 'calculato
 
 // Use relative API URL for both development and production
 // The webpack dev server proxy will forward /api requests to localhost:5000 in development
+// Fallback to direct backend URL if proxy fails
 const API_URL = '/api';
+const FALLBACK_API_URL = 'http://localhost:5000/api';
 
 const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, initialPage = 'home' }) => {
   const [currentPage, setCurrentPage] = useState<Page>(initialPage);
   const [user, setUser] = useState<User | null>(null);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Helper function to make API requests with fallback
+  const fetchWithFallback = async (endpoint: string, options?: RequestInit): Promise<Response> => {
+    try {
+      // First try with proxy
+      console.log(`Attempting API call to: ${API_URL}${endpoint}`);
+      const response = await fetch(`${API_URL}${endpoint}`, options);
+      
+      // Check if we got a proxy error (HTML response when expecting JSON)
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        if (text.includes('proxy') || text.includes('Error occurred')) {
+          console.log('Proxy failed, trying direct backend connection...');
+          throw new Error('Proxy failed');
+        }
+      }
+      
+      return response;
+    } catch (error) {
+      console.log(`Proxy failed, attempting direct connection to: ${FALLBACK_API_URL}${endpoint}`);
+      // Fallback to direct backend connection
+      return fetch(`${FALLBACK_API_URL}${endpoint}`, options);
+    }
+  };
 
   // Form states
   const [loginForm, setLoginForm] = useState({
@@ -108,10 +135,10 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     GOAL: string;
   }) => {
     try {
-      console.log('Attempting registration with URL:', `${API_URL}/users/register`);
+      console.log('Attempting registration...');
       console.log('Request data:', userData);
       
-      const response = await fetch(`${API_URL}/users/register`, {
+      const response = await fetchWithFallback('/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +147,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
       });
       
       console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
+      console.log('Response URL:', response.url);
       
       // Check if response is actually JSON
       const contentType = response.headers.get('content-type');
@@ -161,7 +188,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     e.preventDefault();
     
     try {
-      const response = await fetch(`${API_URL}/users/login`, {
+      const response = await fetchWithFallback('/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -206,7 +233,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
     if (!token) return;
     
     try {
-      const response = await fetch(`${API_URL}/workouts`, {
+      const response = await fetchWithFallback('/workouts', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
