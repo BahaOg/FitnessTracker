@@ -301,11 +301,9 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegisterSuccess, onBack }
                 className={errors.GOAL ? 'error' : ''}
               >
                 <option value="">Select your fitness goal</option>
-                <option value="weight_loss">Weight Loss</option>
-                <option value="muscle_gain">Muscle Gain</option>
+                <option value="weight_loss">Lose weight</option>
+                <option value="muscle_gain">Muscle gain</option>
                 <option value="maintenance">Maintenance</option>
-                <option value="endurance">Endurance</option>
-                <option value="strength">Strength</option>
               </select>
               {errors.GOAL && <span className="error-message">{errors.GOAL}</span>}
             </div>

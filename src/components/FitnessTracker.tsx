@@ -36,8 +36,8 @@ interface FitnessTrackerProps {
 
 type Page = 'home' | 'register' | 'login' | 'dashboard' | 'profile' | 'calculator' | 'workouts';
 
-// Use relative API URL since frontend and backend are on the same server
-const API_URL = '/api';
+// Use relative API URL in production, full URL in development
+const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : '/api';
 
 const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, initialPage = 'home' }) => {
   const [currentPage, setCurrentPage] = useState<Page>(initialPage);
@@ -375,24 +375,57 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
   );
 
   const renderHomePage = () => (
-    <div className="jumbotron text-center">
-      <h1 className="display-4">Welcome to Fitness Tracker</h1>
-      <p className="lead">Track your workouts, set goals, and improve your fitness level</p>
-      <hr className="my-4" />
-      <p>Register or login to get started</p>
-      <div>
-        <button 
-          className="btn btn-primary btn-lg me-2"
-          onClick={() => setCurrentPage('register')}
-        >
-          Register
-        </button>
-        <button 
-          className="btn btn-secondary btn-lg"
-          onClick={() => setCurrentPage('login')}
-        >
-          Login
-        </button>
+    <div className="home-main-container d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+      <div className="card shadow-lg p-4 mx-auto" style={{ maxWidth: 600, width: '100%', borderRadius: 24, background: '#fff' }}>
+        <h1 className="display-4 fw-bold text-center mb-2">Welcome to Fitness Tracker</h1>
+        <p className="lead text-center mb-4">Track your workouts, set goals, and improve your fitness level</p>
+        <p className="text-center mb-4">Register or login to get started with your fitness journey</p>
+        <div className="row text-center mb-4">
+          <div className="col-4">
+            <div>
+              <span style={{ fontSize: 40, color: '#3b82f6' }} role="img" aria-label="dumbbell">🏋️‍♂️</span>
+              <h5 className="mt-2 mb-1">Track Workouts</h5>
+              <div style={{ fontSize: 14, color: '#6b7280' }}>Log your exercises, duration, and calories burned</div>
+            </div>
+          </div>
+          <div className="col-4">
+            <div>
+              <span style={{ fontSize: 40, color: '#22c55e' }} role="img" aria-label="progress">📈</span>
+              <h5 className="mt-2 mb-1">Monitor Progress</h5>
+              <div style={{ fontSize: 14, color: '#6b7280' }}>View your fitness journey with detailed statistics</div>
+            </div>
+          </div>
+          <div className="col-4">
+            <div>
+              <span style={{ fontSize: 40, color: '#f59e42' }} role="img" aria-label="target">🎯</span>
+              <h5 className="mt-2 mb-1">Set Goals</h5>
+              <div style={{ fontSize: 14, color: '#6b7280' }}>Create and achieve your personal fitness targets</div>
+            </div>
+          </div>
+        </div>
+        <div className="d-flex justify-content-center gap-3 mb-4">
+          <button 
+            className="btn btn-primary btn-lg px-4"
+            onClick={() => setCurrentPage('register')}
+          >
+            Get Started - Register
+          </button>
+          <button 
+            className="btn btn-outline-primary btn-lg px-4"
+            onClick={() => setCurrentPage('login')}
+          >
+            Login
+          </button>
+        </div>
+        <div className="card mt-3 p-3" style={{ borderRadius: 16, background: '#f8fafc' }}>
+          <div className="d-flex align-items-center mb-2">
+            <span style={{ fontSize: 24, marginRight: 10 }} role="img" aria-label="analytics">📊</span>
+            <h5 className="mb-0">Detailed Analytics</h5>
+          </div>
+          <div style={{ color: '#6b7280', fontSize: 15 }}>
+            Track your progress with comprehensive workout history, duration tracking, and calorie burn calculations.
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -400,7 +433,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
   const renderRegisterPage = () => (
     <RegisterPage 
       onRegisterSuccess={handleRegister}
-      onBack={() => setCurrentPage('home')}
+      onBack={() => onNavigateToLanding ? onNavigateToLanding() : setCurrentPage('home')}
     />
   );
 
@@ -410,7 +443,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
         <div className="login-header">
           <button 
             className="back-button"
-            onClick={() => setCurrentPage('home')}
+            onClick={() => onNavigateToLanding ? onNavigateToLanding() : setCurrentPage('home')}
             type="button"
           >
             ← Go Back

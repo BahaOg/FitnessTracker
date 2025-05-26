@@ -128,7 +128,7 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId;
-    const { name, surname, password, height, weight, GOAL } = req.body;
+    const { name, surname, password, height, weight, birthDate, GOAL } = req.body;
 
     // Find the user
     const user = await User.findById(userId);
@@ -142,6 +142,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     if (surname !== undefined) user.surname = surname;
     if (height !== undefined) user.height = height;
     if (weight !== undefined) user.weight = weight;
+    if (birthDate !== undefined) user.birthDate = birthDate;
     if (GOAL !== undefined) user.GOAL = GOAL;
     
     // Handle password update separately (it needs to be hashed)

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './MyWorkouts.css';
 
+const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : '/api';
+
 interface Workout {
   _id: string;
   name: string;
@@ -32,7 +34,7 @@ const MyWorkouts: React.FC<MyWorkoutsProps> = () => {
         return;
       }
 
-      let url = '/api/workouts';
+      let url = `${API_URL}/workouts`;
       const params = new URLSearchParams();
       
       if (start) params.append('startDate', start);

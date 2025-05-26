@@ -11,7 +11,8 @@ const App: React.FC = () => {
   // Check if user is already logged in on app start
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
+    const wasLoggedIn = localStorage.getItem('wasLoggedIn');
+    if (token && wasLoggedIn === 'true') {
       // If user is logged in, go directly to the app
       setCurrentPage('app');
     }
@@ -29,6 +30,7 @@ const App: React.FC = () => {
 
   const handleNavigateToLanding = () => {
     setCurrentPage('landing');
+    setInitialAppPage('home');
   };
 
   // Listen for logout events to return to landing page

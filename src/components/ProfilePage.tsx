@@ -25,6 +25,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
     password: '',
     height: user.height,
     weight: user.weight,
+    birthDate: user.birthDate,
     GOAL: user.GOAL
   });
 
@@ -58,6 +59,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
     }
     if (!formData.height.trim()) newErrors.height = 'Height is required';
     if (!formData.weight.trim()) newErrors.weight = 'Weight is required';
+    if (!formData.birthDate) newErrors.birthDate = 'Birth date is required';
     if (!formData.GOAL) newErrors.GOAL = 'Goal is required';
 
     setErrors(newErrors);
@@ -80,6 +82,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
         surname: formData.surname.trim(),
         height: formData.height.trim(),
         weight: formData.weight.trim(),
+        birthDate: formData.birthDate,
         GOAL: formData.GOAL
       };
 
@@ -128,8 +131,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
       case 'weight_loss': return 'Lose weight';
       case 'muscle_gain': return 'Muscle gain';
       case 'maintenance': return 'Maintenance';
-      case 'endurance': return 'Endurance';
-      case 'strength': return 'Strength';
       default: return goal;
     }
   };
@@ -251,16 +252,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="birthdate">Birthdate</label>
+              <label htmlFor="birthdate">Birth Date</label>
               <input
-                type="text"
-                id="birthdate"
-                name="birthdate"
-                value={new Date(user.birthDate).toLocaleDateString('en-GB')}
-                disabled
-                className="disabled-field"
-                placeholder="01/01/1985"
+                type="date"
+                id="birthDate"
+                name="birthDate"
+                value={formData.birthDate}
+                onChange={handleInputChange}
+                className={errors.birthDate ? 'error' : ''}
               />
+              {errors.birthDate && <span className="error-message">{errors.birthDate}</span>}
             </div>
           </div>
 
@@ -277,8 +278,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onProfileUpdate }) => {
               <option value="weight_loss">Lose weight</option>
               <option value="muscle_gain">Muscle gain</option>
               <option value="maintenance">Maintenance</option>
-              <option value="endurance">Endurance</option>
-              <option value="strength">Strength</option>
             </select>
             {errors.GOAL && <span className="error-message">{errors.GOAL}</span>}
           </div>
