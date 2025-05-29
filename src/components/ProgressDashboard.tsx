@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ProgressDashboard.css';
+import { log } from 'console';
 
 interface User {
   id: string;
@@ -42,7 +43,7 @@ interface ProgressDashboardProps {
 
 const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts }) => {
   const [dateRange, setDateRange] = useState({
-    start: new Date(Date.now() - 23 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 23 days ago
+    start: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 29 days ago
     end: new Date().toISOString().split('T')[0] // today
   });
   
@@ -50,15 +51,14 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
   const [calorieData, setCalorieData] = useState<CalorieEntry[]>([]);
   const [currentWeight, setCurrentWeight] = useState<number>(0);
   const [goalProgress, setGoalProgress] = useState<number>(0);
-  const [todayNetIntake, setTodayNetIntake] = useState<number>(0);
+  const [totalNetIntake30Days, setTotalNetIntake30Days] = useState<number>(0);
+  const [weightChange30Days, setWeightChange30Days] = useState<number>(0);
   const [weeklyAverages, setWeeklyAverages] = useState({
     intake: 0,
     burned: 0,
     net: 0,
     bmr: 0
   });
-
-
 
   // Calculate BMR
   const calculateBMR = (): number => {
@@ -93,7 +93,28 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
     
     const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     
-    // Calculate total calories burned in the period to determine realistic weight change
+    // Calculate realistic weight change based on goal and expected calorie balance
+    let expectedWeightChange = 0;
+    const days = daysDiff + 1;
+    
+    // Estimate daily calorie balance based on goal
+    let dailyCalorieBalance = 0;
+    switch (user.GOAL) {
+      case 'lose weight':
+        dailyCalorieBalance = -600; // 600 calorie deficit per day
+        expectedWeightChange = -(days * Math.abs(dailyCalorieBalance)) / 7700; // 1kg ≈ 7700 calories
+        break;
+      case 'gain weight':
+        dailyCalorieBalance = 400; // 400 calorie surplus per day
+        expectedWeightChange = (days * dailyCalorieBalance) / 7700;
+        break;
+      case 'maintain weight':
+        dailyCalorieBalance = 0;
+        expectedWeightChange = 0;
+        break;
+    }
+    
+    // Add workout effectiveness factor
     const totalCaloriesBurned = workouts
       .filter(w => {
         const workoutDate = new Date(w.date);
@@ -101,22 +122,13 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
       })
       .reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
     
-    // Calculate realistic weight change based on actual workouts and goal
-    let totalWeightChange = 0;
+    // Enhance weight change based on workout activity
     if (totalCaloriesBurned > 0) {
-      switch (user.GOAL) {
-        case 'lose weight':
-          // 1 kg ≈ 7700 calories, workouts contribute to weight loss
-          totalWeightChange = -(totalCaloriesBurned / 7700) * 0.7; // 70% efficiency
-          break;
-        case 'gain weight':
-          // With workouts, weight gain is more muscle-focused
-          totalWeightChange = (totalCaloriesBurned / 7700) * 0.3; // Muscle building
-          break;
-        case 'maintain weight':
-          // Small fluctuations around maintenance
-          totalWeightChange = 0;
-          break;
+      const workoutEffect = totalCaloriesBurned / 7700 * 0.3; // 30% workout effectiveness
+      if (user.GOAL === 'lose weight') {
+        expectedWeightChange -= workoutEffect;
+      } else if (user.GOAL === 'gain weight') {
+        expectedWeightChange += workoutEffect * 0.5; // Less impact on weight gain
       }
     }
     
@@ -124,12 +136,12 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       
-      // Progressive weight change based on workout progress
+      // Progressive weight change following expected trend
       const progressRatio = i / daysDiff;
-      const currentWeightChange = totalWeightChange * progressRatio;
+      const currentWeightChange = expectedWeightChange * progressRatio;
       
-      // Small daily fluctuations (±0.3kg)
-      const dailyFluctuation = (Math.random() - 0.5) * 0.6;
+      // Add realistic daily fluctuations (±0.2kg)
+      const dailyFluctuation = (Math.random() - 0.5) * 0.4;
       const weight = startWeight + currentWeightChange + dailyFluctuation;
       
       data.push({
@@ -162,29 +174,29 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
       });
       const caloriesBurned = dayWorkouts.reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
       
-      // Use goal-appropriate calorie intake for today only, others show maintenance
+      // Generate realistic calorie intake based on goal and activity level
       let intake: number;
-      const today = new Date().toISOString().split('T')[0];
+      const baseVariation = (Math.random() - 0.5) * 400; // ±200 calorie daily variation
       
-      if (dateStr === today) {
-        // Today's intake based on goal
-        switch (user.GOAL) {
-          case 'lose weight':
-            intake = bmr + caloriesBurned - 625; // Target deficit
-            break;
-          case 'gain weight':
-            intake = bmr + caloriesBurned + 625; // Target surplus
-            break;
-          case 'maintain weight':
-            intake = bmr + caloriesBurned; // Maintenance
-            break;
-          default:
-            intake = bmr + caloriesBurned;
-        }
-      } else {
-        // For other days, use maintenance calories for consistency
-        intake = bmr + caloriesBurned;
+      switch (user.GOAL) {
+        case 'lose weight':
+          // Deficit of 500-700 calories from maintenance
+          intake = bmr + caloriesBurned - 600 + baseVariation;
+          break;
+        case 'gain weight':
+          // Surplus of 300-500 calories above maintenance
+          intake = bmr + caloriesBurned + 400 + baseVariation;
+          break;
+        case 'maintain weight':
+          // Near maintenance with small variations
+          intake = bmr + caloriesBurned + baseVariation;
+          break;
+        default:
+          intake = bmr + caloriesBurned + baseVariation;
       }
+      
+      // Ensure intake is not unrealistically low
+      intake = Math.max(intake, bmr * 0.8);
       
       const net = intake - bmr - caloriesBurned;
       
@@ -199,17 +211,12 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
     return data;
   };
 
-
-
-
-
-
-
   useEffect(() => {
     const weights = generateWeightData();
     const calories = generateCalorieData();
     
     setWeightData(weights);
+    console.log(weights);
     setCalorieData(calories);
     setCurrentWeight(parseFloat(user.weight));
     
@@ -223,20 +230,19 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
       setGoalProgress(Math.min(100, Math.max(0, progress)));
     }
     
-    // Calculate today's net intake (intake - BMR - calories burned)
-    const today = new Date().toISOString().split('T')[0];
-    const todayData = calories.find(entry => entry.date === today);
-    const bmr = calculateBMR();
-    if (todayData) {
-      const netIntake = todayData.intake - bmr - todayData.burned;
-      setTodayNetIntake(netIntake);
+    // Calculate total 30-day net intake (sum of all daily net calories)
+    if (calories.length > 0) {
+      const totalNet = calories.reduce((sum, entry) => sum + entry.net, 0);
+      setTotalNetIntake30Days(totalNet);
     } else {
-      setTodayNetIntake(0);
+      setTotalNetIntake30Days(0);
     }
     
-
-    
-
+    // Calculate weight change over 30 days
+    if (weights.length > 0) {
+      const weightChange = weights[weights.length - 1].weight - weights[0].weight;
+      setWeightChange30Days(Math.round(weightChange * 10) / 10); // Round to 1 decimal place
+    }
     
     // Calculate weekly averages
     if (calories.length > 0) {
@@ -275,8 +281,8 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
           <div className="dashboard-info">
             <span className="info-icon">📊</span>
             <span className="info-text">
-              Workout data is from your actual recorded exercises. 
-              Calorie intake is estimated based on your fitness goal.
+              Showing 30-day data. Workout data from your actual exercises. 
+              Calorie intake estimated based on your fitness goal.
             </span>
           </div>
         </div>
@@ -354,8 +360,6 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
           </div>
         </div>
 
-
-
         {/* Weekly Averages */}
         <div className="dashboard-card weekly-averages">
           <h3>Weekly Averages</h3>
@@ -385,16 +389,26 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, workouts })
           <div className="stat-value">{currentWeight} <span className="unit">kg</span></div>
         </div>
 
-        <div className="dashboard-card total-net-intake">
-          <h3>Total Net Intake</h3>
-          <div className={`stat-value ${todayNetIntake >= 0 ? 'positive' : 'negative'}`}>
-            {todayNetIntake > 0 ? '+' : ''}{todayNetIntake.toLocaleString()} <span className="unit">kcal</span>
+        <div className="dashboard-card weight-change">
+          <h3>30-Day Weight Change</h3>
+          <div className={`stat-value ${weightChange30Days >= 0 ? 'positive' : 'negative'}`}>
+            {weightChange30Days > 0 ? '+' : ''}{weightChange30Days} <span className="unit">kg</span>
           </div>
         </div>
 
+        <div className="dashboard-card total-net-intake">
+          <h3>30-Day Total Net Intake</h3>
+          <div className={`stat-value ${totalNetIntake30Days >= 0 ? 'positive' : 'negative'}`}>
+            {totalNetIntake30Days > 0 ? '+' : ''}{totalNetIntake30Days.toLocaleString()} <span className="unit">kcal</span>
+          </div>
+        </div>
 
-
-
+        <div className="dashboard-card avg-daily-burn">
+          <h3>Average Daily Burn</h3>
+          <div className="stat-value">
+            {weeklyAverages.burned.toLocaleString()} <span className="unit">kcal/day</span>
+          </div>
+        </div>
 
         {/* Recent Workouts */}
         <div className="dashboard-card recent-workouts">
