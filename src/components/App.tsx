@@ -44,7 +44,7 @@ const App: React.FC = () => {
 
     // Listen for storage events (when localStorage changes)
     window.addEventListener('storage', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };

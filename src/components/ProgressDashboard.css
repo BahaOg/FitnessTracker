@@ -65,7 +65,7 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(6, auto);
+  grid-template-rows: repeat(4, auto);
   gap: 24px;
   max-width: 1200px;
   margin: 0 24px;
@@ -137,6 +137,8 @@
   font-weight: 500;
 }
 
+
+
 /* Weekly Averages */
 .weekly-averages {
   grid-column: span 2;
@@ -170,9 +172,7 @@
 
 /* Bottom Stats Cards */
 .current-weight,
-.total-net-intake,
-.weight-change,
-.avg-daily-burn {
+.total-net-intake {
   grid-column: span 1;
   text-align: center;
 }
@@ -287,13 +287,8 @@
   }
   
   .current-weight,
-  .total-net-intake,
-  .weight-change {
+  .total-net-intake {
     grid-column: span 1;
-  }
-
-  .avg-daily-burn {
-    grid-column: span 2;
   }
 }
 
@@ -332,9 +327,7 @@
   .weekly-averages,
   .recent-workouts,
   .current-weight,
-  .total-net-intake,
-  .weight-change,
-  .avg-daily-burn {
+  .total-net-intake {
     grid-column: span 1;
   }
   

@@ -119,8 +119,8 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
       // If user was previously logged in but token is invalid, redirect to home
       const wasLoggedIn = localStorage.getItem('wasLoggedIn');
       if (wasLoggedIn || currentPage === 'dashboard' || currentPage === 'profile' || currentPage === 'calculator' || currentPage === 'workouts') {
-        setCurrentPage('home');
-      }
+      setCurrentPage('home');
+    }
       // Clean up any stale authentication state
       localStorage.removeItem('wasLoggedIn');
     }
@@ -459,7 +459,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
             </div>
           </div>
           <div className="col-4">
-            <div>
+      <div>
               <span style={{ fontSize: 40, color: '#f59e42' }} role="img" aria-label="target">🎯</span>
               <h5 className="mt-2 mb-1">Set Goals</h5>
               <div style={{ fontSize: 14, color: '#6b7280' }}>Create and achieve your personal fitness targets</div>
@@ -467,18 +467,18 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ onNavigateToLanding, in
           </div>
         </div>
         <div className="d-flex justify-content-center gap-3 mb-4">
-          <button 
+        <button 
             className="btn btn-primary btn-lg px-4"
-            onClick={() => setCurrentPage('register')}
-          >
+          onClick={() => setCurrentPage('register')}
+        >
             Get Started - Register
-          </button>
-          <button 
+        </button>
+        <button 
             className="btn btn-outline-primary btn-lg px-4"
-            onClick={() => setCurrentPage('login')}
-          >
-            Login
-          </button>
+          onClick={() => setCurrentPage('login')}
+        >
+          Login
+        </button>
         </div>
         <div className="card mt-3 p-3" style={{ borderRadius: 16, background: '#f8fafc' }}>
           <div className="d-flex align-items-center mb-2">
