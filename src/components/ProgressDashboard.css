@@ -137,8 +137,6 @@
   font-weight: 500;
 }
 
-
-
 /* Weekly Averages */
 .weekly-averages {
   grid-column: span 2;
@@ -226,11 +224,65 @@
   gap: 24px;
   font-size: 14px;
   color: #6b7280;
+  flex-wrap: wrap;
 }
 
 .workout-duration,
-.workout-calories {
+.workout-calories,
+.workout-weight,
+.workout-net-intake {
   font-weight: 500;
+}
+
+.workout-weight {
+  color: #8B5CF6;
+}
+
+.workout-net-intake {
+  color: #10B981;
+}
+
+.workout-notes {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  border-left: 3px solid #e5e7eb;
+}
+
+.recent-stats {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stats-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stats-summary .stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
 }
 
 .workout-count {

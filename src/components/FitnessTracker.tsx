@@ -28,6 +28,8 @@ interface Workout {
   date: string;
   caloriesBurned?: number;
   notes?: string;
+  weight?: number;
+  netIntake?: number;
 }
 
 interface FitnessTrackerProps {
